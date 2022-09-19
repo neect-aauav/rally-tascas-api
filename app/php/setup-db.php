@@ -20,9 +20,11 @@ $tables = array(
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT
     )",
     "CREATE TABLE `rallyneect`.`teamsMembers`(
-        teamId INT NOT NULL FOREIGN KEY Teams(id) ,
-        memberId INT NOT NULL FOREIGN KEY Members(id) ,
-        id INT NOT NULL PRIMARY KEY AUTO_INCREMENT
+        teamID INT NOT NULL ,
+        memberID INT NOT NULL ,
+        id INT NOT NULL PRIMARY KEY AUTO_INCREMENT ,
+    	FOREIGN KEY (teamID) REFERENCES Teams(id) ,
+    	FOREIGN KEY (memberID) REFERENCES Members(id)
     )"
 );
 

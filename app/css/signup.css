@@ -1,0 +1,61 @@
+.signup-form > p {
+    text-align: center;
+    font-size: 30px;
+}
+
+.signup-form > form {
+    display: flex;
+    row-gap: 30px;
+    flex-direction: column;
+}
+
+.signup-form > form input[type="text"], .signup-form > form input[type="email"] {
+    width: 99%;
+    font-size: 20px;
+    border: 0;
+    border-bottom: 1px solid silver;
+    padding: 5px;
+}
+
+.signup-form > form select {
+    border: 1px solid silver;
+    background-color: white;
+    font-size: 20px;
+    max-width: 400px;
+}
+
+.members {
+    display: flex;
+    row-gap: 10px;
+    flex-direction: column;
+}
+
+.members > div:first-child {
+    font-size: 25px;
+}
+
+.members > div {
+    display: flex;
+    column-gap: 10px;
+}
+
+.signup-form button {
+    font-size: 20px;
+    padding: 5px;
+    border: 1px solid silver;
+}
+
+.add-member {
+    font-size: 18px;
+    padding: 5px;
+}
+
+.separator {
+    margin: 25px 0;
+}
+
+.team {
+    display: flex;
+    flex-direction: row;
+    column-gap: 10px;
+}
