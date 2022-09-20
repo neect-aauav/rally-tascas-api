@@ -40,22 +40,40 @@ if ($method === 'POST') {
                 // check if email exists
                 $sql = "SELECT * FROM Teams WHERE email=?";
                 $result = makeSQLQuery($conn, $sql, 's', [$team_email]);
-                if (!mysqli_fetch_assoc($result)) {                
-                    // add team
-                    $sql = "INSERT INTO Teams (name, email, members) VALUES (?, ?, ?)";
-                    makeSQLQuery($conn, $sql, 'ssi', [$team_name, $team_email, $n_members]);
-                    $teamId = mysqli_fetch_assoc(makeSQLQuery($conn, "SELECT id FROM Teams WHERE email=?", 's', [$team_email]))["id"];
+                if (!mysqli_fetch_assoc($result)) {
+                    $existing_members = Array();
+                    // check if any member already exists
+                    $sql = "SELECT nmec FROM Members WHERE nmec IN (" . join(",", $members_nmecs) . ")";
+                    $result = makeSQLQuery($conn, $sql);
+                    while($row = mysqli_fetch_assoc($result)) {
+                        $existing_members[] = $row['nmec'];
+                    }
 
-                    // add members
-                    $membersIds = Array();
-                    forEach($members_names as $index=>$memberName) {
-                        $sql = "INSERT INTO Members (name, course, nmec) VALUES (?, ?, ?)";
-                        makeSQLQuery($conn, $sql, 'ssi', [$memberName, $members_courses[$index], $members_nmecs[$index]]);
-                        $memberId = mysqli_fetch_assoc(makeSQLQuery($conn, "SELECT id FROM Members WHERE nmec=?", 's', [$members_nmecs[$index]]))["id"];
-                        
-                        // associate the team with the members
-                        $sql = "INSERT INTO TeamsMembers (teamID, memberID) VALUES (?, ?)";
-                        makeSQLQuery($conn, $sql, 'ii', [$teamId, $memberId]);
+                    // if no existing members
+                    if (count($existing_members) == 0) {
+                        // add team
+                        $sql = "INSERT INTO Teams (name, email, members) VALUES (?, ?, ?)";
+                        makeSQLQuery($conn, $sql, 'ssi', [$team_name, $team_email, $n_members]);
+                        $teamId = mysqli_fetch_assoc(makeSQLQuery($conn, "SELECT id FROM Teams WHERE email=?", 's', [$team_email]))["id"];
+
+                        // add members
+                        $membersIds = Array();
+                        forEach($members_names as $index=>$memberName) {
+                            $sql = "INSERT INTO Members (name, course, nmec) VALUES (?, ?, ?)";
+                            makeSQLQuery($conn, $sql, 'ssi', [$memberName, $members_courses[$index], $members_nmecs[$index]]);
+                            $memberId = mysqli_fetch_assoc(makeSQLQuery($conn, "SELECT id FROM Members WHERE nmec=?", 's', [$members_nmecs[$index]]))["id"];
+                            
+                            // associate the team with the members
+                            $sql = "INSERT INTO TeamsMembers (teamID, memberID) VALUES (?, ?)";
+                            makeSQLQuery($conn, $sql, 'ii', [$teamId, $memberId]);
+
+                            header("Location: signup.php?submit=team_added");
+                        }   
+                    }
+                    else {
+                        // member already exists
+                        header("Location: signup.php?submit=member_exists&nmecs=" . join(", ", array_unique($existing_members)));
+                        exit();
                     }
                 }
                 else {
@@ -65,7 +83,7 @@ if ($method === 'POST') {
                 }
             }
             else {
-                // email already exists
+                // name already exists
                 header("Location: signup.php?submit=name_exists");
                 exit();
             }
@@ -112,15 +130,29 @@ if ($method === 'POST') {
                         case "email_exists":
                             echo "
                                 <div style=\"color: red;\">
-                                    There is already a team with that email.
+                                    Já existe uma equipa com esse email associado.
                                 </div>
                             ";
                             break;
                         case "name_exists":
                             echo "
                                 <div style=\"color: red;\">
-                                    There is already a team with that name.
+                                    Já existe uma equipa com esse nome.
                                 </div>
+                            ";
+                            break;
+                        case "member_exists":
+                            echo "
+                            <div style=\"color: red;\">
+                                Os membros com os nmecs " . $_GET['nmecs'] . " já pertencem a uma equipa.
+                            </div>
+                            ";
+                            break;
+                        case "team_added":
+                            echo "
+                            <div style=\"color: green;\">
+                                Equipa criada com sucesso.
+                            </div>
                             ";
                             break;
                     }

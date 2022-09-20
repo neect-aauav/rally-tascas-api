@@ -9,11 +9,16 @@ function apiFetch($endpoint) {
     return $response_data;
 }
 
-function makeSQLQuery($conn, $sql, $types, $vars) {
-    $stmt = mysqli_stmt_init($conn);
-    mysqli_stmt_prepare($stmt, $sql);
-    mysqli_stmt_bind_param($stmt, $types, ...$vars);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
+function makeSQLQuery($conn, $sql, $types = null, $vars = null) {
+    if ($types && $vars) {
+        $stmt = mysqli_stmt_init($conn);
+        mysqli_stmt_prepare($stmt, $sql);
+        mysqli_stmt_bind_param($stmt, $types, ...$vars);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);   
+    }
+    else {
+        $result = mysqli_query($conn, $sql);
+    }
     return $result;
 }
