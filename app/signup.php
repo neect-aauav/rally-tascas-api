@@ -39,40 +39,29 @@ if ($method === 'POST') {
             if (!mysqli_fetch_assoc($result)) {
                 // check if email exists
                 $sql = "SELECT * FROM Teams WHERE email=?";
-                $stmt = mysqli_stmt_init($conn);
-                // check if the query makes sense
-                if (!mysqli_stmt_prepare($stmt, $sql)) {
-                    header("Location: signup.php?submit=error");
-                    exit();
+                $result = makeSQLQuery($conn, $sql, 's', [$team_email]);
+                if (!mysqli_fetch_assoc($result)) {                
+                    // add team
+                    $sql = "INSERT INTO Teams (name, email, members) VALUES (?, ?, ?)";
+                    makeSQLQuery($conn, $sql, 'ssi', [$team_name, $team_email, $n_members]);
+                    $teamId = mysqli_fetch_assoc(makeSQLQuery($conn, "SELECT id FROM Teams WHERE email=?", 's', [$team_email]))["id"];
+
+                    // add members
+                    $membersIds = Array();
+                    forEach($members_names as $index=>$memberName) {
+                        $sql = "INSERT INTO Members (name, course, nmec) VALUES (?, ?, ?)";
+                        makeSQLQuery($conn, $sql, 'ssi', [$memberName, $members_courses[$index], $members_nmecs[$index]]);
+                        $memberId = mysqli_fetch_assoc(makeSQLQuery($conn, "SELECT id FROM Members WHERE nmec=?", 's', [$members_nmecs[$index]]))["id"];
+                        
+                        // associate the team with the members
+                        $sql = "INSERT INTO TeamsMembers (teamID, memberID) VALUES (?, ?)";
+                        makeSQLQuery($conn, $sql, 'ii', [$teamId, $memberId]);
+                    }
                 }
                 else {
-                    mysqli_stmt_bind_param($stmt, 's', $team_email);
-                    mysqli_stmt_execute($stmt);
-                    $result = mysqli_stmt_get_result($stmt);
-                    if (!mysqli_fetch_assoc($result)) {                
-                        // add team
-                        $sql = "INSERT INTO Teams (name, email, members) VALUES (?, ?, ?)";
-                        $stmt = mysqli_stmt_init($conn);
-                        mysqli_stmt_prepare($stmt, $sql);
-                        mysqli_stmt_bind_param($stmt, 'ssi', $team_name, $team_email, $n_members);
-                        mysqli_stmt_execute($stmt);
-
-                        // add members
-                        forEach($members_names as $memberId=>$memberName) {
-                            //print_r($memberId);
-                            //print_r($members_courses[$memberId]);
-                            $sql = "INSERT INTO Members (name, course, nmec) VALUES (?, ?, ?)";
-                            $stmt = mysqli_stmt_init($conn);
-                            mysqli_stmt_prepare($stmt, $sql);
-                            mysqli_stmt_bind_param($stmt, 'ssi', $memberName, $members_courses[$memberId], $members_nmecs[$memberId]);
-                            mysqli_stmt_execute($stmt);
-                        }
-                    }
-                    else {
-                        // email already exists
-                        header("Location: signup.php?submit=email_exists");
-                        exit();
-                    }
+                    // email already exists
+                    header("Location: signup.php?submit=email_exists");
+                    exit();
                 }
             }
             else {
