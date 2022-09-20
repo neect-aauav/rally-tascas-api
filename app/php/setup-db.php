@@ -10,16 +10,18 @@ $tables = array(
     "CREATE TABLE `rallyneect`.`Teams`(
         name VARCHAR(255) NOT NULL ,
         email VARCHAR(255) NOT NULL ,
-        points INT NOT NULL ,
+        points INT NOT NULL DEFAULT 0 ,
+        members INT NOT NULL ,
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT
     )",
     "CREATE TABLE `rallyneect`.`Members`(
         name VARCHAR(255) NOT NULL ,
         course VARCHAR(255) NOT NULL,
-        points INT NOT NULL ,
+        nmec INT NOT NULL,
+        points INT NOT NULL DEFAULT 0 ,
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT
     )",
-    "CREATE TABLE `rallyneect`.`teamsMembers`(
+    "CREATE TABLE `rallyneect`.`TeamsMembers`(
         teamID INT NOT NULL ,
         memberID INT NOT NULL ,
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT ,

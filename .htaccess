@@ -4,4 +4,4 @@ RewriteRule ^([^\.]+)$ $1.php [NC,L]
 
 ErrorDocument 404 /home
 
-php_flag display_errors off
+php_flag display_errors on

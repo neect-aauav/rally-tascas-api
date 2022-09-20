@@ -1,6 +1,6 @@
-.signup-form > p {
+.signup-form p {
     text-align: center;
-    font-size: 30px;
+    font-size: 35px;
 }
 
 .signup-form > form {
@@ -24,6 +24,11 @@
     max-width: 400px;
 }
 
+.nmec-input {
+    width: 70px !important;
+    text-align: center;
+}
+
 .members {
     display: flex;
     row-gap: 10px;
@@ -39,7 +44,11 @@
     column-gap: 10px;
 }
 
-.signup-form button {
+.members > div:not(.add-member) {
+    padding: 10px 0;
+}
+
+.signup-form input[type="submit"] {
     font-size: 20px;
     padding: 5px;
     border: 1px solid silver;
@@ -48,6 +57,27 @@
 .add-member {
     font-size: 18px;
     padding: 5px;
+}
+
+.remove-member {
+    position: relative;
+    padding: 17px;
+}
+
+.remove-member > div div {
+    width: 26px;
+    height: 2px;
+    background-color: black;
+    width: 30px;
+}
+
+.remove-member > div div:nth-child(1) {
+    rotate: 45deg;
+}
+
+.remove-member > div div:nth-child(2) {
+    rotate: -45deg;
+    margin-top: -2px;
 }
 
 .separator {
