@@ -38,3 +38,10 @@ foreach($tables as $table) {
         mysqli_query($conn, $table);
     }
 }
+
+// add admin
+if ($admin_username && $admin_password) {
+    $sql = "INSERT INTO Admin (username, pwd) VALUES (?, ?)";
+    makeSQLQuery($conn, $sql, 'ss', [$admin_username, password_hash($admin_password, PASSWORD_DEFAULT)]);
+    echo "Added Admin";
+}

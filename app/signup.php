@@ -40,7 +40,7 @@ if ($method === 'POST') {
                 $sql = "SELECT * FROM Teams WHERE email=?";
                 $result = makeSQLQuery($conn, $sql, 's', [$team_email]);
                 if (!mysqli_fetch_assoc($result)) {
-                    $existing_members = Array();
+                    $existing_members = array();
                     // check if any member already exists
                     $sql = "SELECT nmec FROM Members WHERE nmec IN (" . join(",", $members_nmecs) . ")";
                     $result = makeSQLQuery($conn, $sql);
@@ -56,7 +56,7 @@ if ($method === 'POST') {
                         $teamId = mysqli_fetch_assoc(makeSQLQuery($conn, "SELECT id FROM Teams WHERE email=?", 's', [$team_email]))["id"];
 
                         // add members
-                        $membersIds = Array();
+                        $membersIds = array();
                         forEach($members_names as $index=>$memberName) {
                             $sql = "INSERT INTO Members (name, course, nmec, team) VALUES (?, ?, ?, ?)";
                             makeSQLQuery($conn, $sql, 'ssii', [$memberName, $members_courses[$index], $members_nmecs[$index], $teamId]);
