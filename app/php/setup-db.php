@@ -11,7 +11,6 @@ $tables = array(
         name VARCHAR(255) NOT NULL ,
         email VARCHAR(255) NOT NULL ,
         points INT NOT NULL DEFAULT 0 ,
-        members INT NOT NULL ,
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT
     )",
     "CREATE TABLE `rallyneect`.`Members`(
@@ -19,15 +18,15 @@ $tables = array(
         course VARCHAR(255) NOT NULL,
         nmec INT NOT NULL,
         points INT NOT NULL DEFAULT 0 ,
+        team INT NOT NULL ,
+        id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+        FOREIGN KEY (team) REFERENCES Teams(id)
+    )",
+    "CREATE TABLE `rallyneect`.`Admin`(
+        username VARCHAR(255) NOT NULL ,
+        pwd TEXT NOT NULL ,
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT
     )",
-    "CREATE TABLE `rallyneect`.`TeamsMembers`(
-        teamID INT NOT NULL ,
-        memberID INT NOT NULL ,
-        id INT NOT NULL PRIMARY KEY AUTO_INCREMENT ,
-    	FOREIGN KEY (teamID) REFERENCES Teams(id) ,
-    	FOREIGN KEY (memberID) REFERENCES Members(id)
-    )"
 );
 
 echo "Adding tables:<br>";

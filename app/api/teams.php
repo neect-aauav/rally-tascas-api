@@ -12,7 +12,7 @@ if ($method === 'GET') {
     header('Content-type: application/json; charset=utf-8');
 
     $response = array();
-    $data = Array();
+    $data = array();
     $filter = 1;
     $columns = "*";
 
@@ -23,6 +23,13 @@ if ($method === 'GET') {
     $sql = "SELECT ". $columns ."  FROM Teams WHERE ". $filter;
     $result = makeSQLQuery($conn, $sql);
     while($row = mysqli_fetch_assoc($result)) {
+        // get members from ids
+        $sql = "SELECT * FROM Members WHERE team = " . $row["id"];
+        $membersResult = makeSQLQuery($conn, $sql);
+        while($membersRow = mysqli_fetch_assoc($membersResult)) {
+            $row["members"][] = $membersRow; 
+        }
+
         $data[] = $row;
     }
 

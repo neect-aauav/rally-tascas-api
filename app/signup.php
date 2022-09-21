@@ -22,7 +22,6 @@ if ($method === 'POST') {
         $members_names = $_POST['member'];
         $members_nmecs = $_POST['nmec'];
         $members_courses = $_POST['course'];
-        $n_members = count($members_names);
         
         // check if name exists
         $sql = "SELECT * FROM Teams WHERE name=?";
@@ -52,20 +51,15 @@ if ($method === 'POST') {
                     // if no existing members
                     if (count($existing_members) == 0) {
                         // add team
-                        $sql = "INSERT INTO Teams (name, email, members) VALUES (?, ?, ?)";
-                        makeSQLQuery($conn, $sql, 'ssi', [$team_name, $team_email, $n_members]);
+                        $sql = "INSERT INTO Teams (name, email) VALUES (?, ?)";
+                        makeSQLQuery($conn, $sql, 'ss', [$team_name, $team_email]);
                         $teamId = mysqli_fetch_assoc(makeSQLQuery($conn, "SELECT id FROM Teams WHERE email=?", 's', [$team_email]))["id"];
 
                         // add members
                         $membersIds = Array();
                         forEach($members_names as $index=>$memberName) {
-                            $sql = "INSERT INTO Members (name, course, nmec) VALUES (?, ?, ?)";
-                            makeSQLQuery($conn, $sql, 'ssi', [$memberName, $members_courses[$index], $members_nmecs[$index]]);
-                            $memberId = mysqli_fetch_assoc(makeSQLQuery($conn, "SELECT id FROM Members WHERE nmec=?", 's', [$members_nmecs[$index]]))["id"];
-                            
-                            // associate the team with the members
-                            $sql = "INSERT INTO TeamsMembers (teamID, memberID) VALUES (?, ?)";
-                            makeSQLQuery($conn, $sql, 'ii', [$teamId, $memberId]);
+                            $sql = "INSERT INTO Members (name, course, nmec, team) VALUES (?, ?, ?, ?)";
+                            makeSQLQuery($conn, $sql, 'ssii', [$memberName, $members_courses[$index], $members_nmecs[$index], $teamId]);
 
                             header("Location: signup.php?submit=team_added");
                         }   
