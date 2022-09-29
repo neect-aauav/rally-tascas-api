@@ -27,6 +27,19 @@ $tables = array(
         pwd TEXT NOT NULL ,
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT
     )",
+    "CREATE TABLE `rallyneect`.`Bars`(
+        name VARCHAR(255) NOT NULL ,
+        location TEXT ,
+        picture TEXT ,
+        id INT NOT NULL PRIMARY KEY AUTO_INCREMENT
+    )",
+    "CREATE TABLE `rallyneect`.`TeamsBars`(
+        teamdId INT NOT NULL ,
+        barId INT NOT NULL ,
+        id INT NOT NULL PRIMARY KEY AUTO_INCREMENT ,
+        FOREIGN KEY (teamdId) REFERENCES Teams(id) ,
+        FOREIGN KEY (barId) REFERENCES Bars(id)
+    )"
 );
 
 echo "Adding tables:<br>";
@@ -40,8 +53,11 @@ foreach($tables as $table) {
 }
 
 // add admin
-if ($admin_username && $admin_password) {
-    $sql = "INSERT INTO Admin (username, pwd) VALUES (?, ?)";
-    makeSQLQuery($conn, $sql, 'ss', [$admin_username, password_hash($admin_password, PASSWORD_DEFAULT)]);
-    echo "Added Admin";
+$admin_row = mysqli_query($conn, "SELECT * FROM Admin WHERE 1");
+if (mysqli_num_rows($admin_row) == 0) { 
+    if ($admin_username && $admin_password) {
+        $sql = "INSERT INTO Admin (username, pwd) VALUES (?, ?)";
+        makeSQLQuery($conn, $sql, 'ss', [$admin_username, password_hash($admin_password, PASSWORD_DEFAULT)]);
+        echo "Added Admin";
+    }
 }

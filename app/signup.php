@@ -98,18 +98,18 @@ if ($method === 'POST') {
     <title>Signup | Rallyween</title>
 </head>
 <body>
-    <div class="signup-form absolute-centered">
+    <div class="form absolute-centered">
         <p>Equipa</p>
         <form action="signup.php" method="post">
             <div class="team">
-                <input placeholder="Nome" type="text" name="team" required>
-                <input placeholder="Email" type="email" name="email" required>           
+                <input title="Atleast 3 characters" minlength="3" placeholder="Nome" type="text" name="team" required>
+                <input placeholder="Email" type="email" name="email" pattern="[^@\s]+@[^@\s]+\.[^@\s]+" required>           
             </div>
             <div class="members">
                 <p>Membros</p>
                 <div>
-                    <input placeholder="Nome" type="text" name="member[0]" required>
-                    <input class="nmec-input" placeholder="NMEC" type="text" name="nmec[0]" required>
+                    <input title="Atleast 3 characters" minlength="3" placeholder="Nome" type="text" name="member[0]" required>
+                    <input title="Numbers only" pattern="\d*" class="nmec-input" placeholder="NMEC" type="text" name="nmec[0]" required>
                     <select name="course[0]" required>
                         <option></option>
                     </select>

@@ -19,7 +19,7 @@ if (isset($_GET['submit']) && $_GET['submit'] == "logout")
     session_destroy();
 // if already in session then go to home
 else if(isset($_SESSION["userId"])){
-    header("Location: admin/stands");
+    header("Location: admin/bars");
     exit();
 }
 
@@ -36,7 +36,7 @@ if ($method === 'POST') {
         $stmt = mysqli_stmt_init($conn);
         // check if the query makes sense
         if (!mysqli_stmt_prepare($stmt, $sql)) {
-            header("Location: login?submit=error");
+            header("Location: admin?submit=error");
             exit();
         }
         else {
@@ -52,18 +52,18 @@ if ($method === 'POST') {
 
                     $_SESSION['userId'] = $row["id"];
 
-                    header("Location: login?submit=login");
+                    header("Location: admin?submit=login");
                     exit();
                 }
                 else {
                     // Password is incorrect
-                    header("Location: login?submit=invalid");
+                    header("Location: admin?submit=invalid");
                     exit();
                 }
             }
             else {
                 // Username not found
-                header("Location: login?submit=invalid");
+                header("Location: admin?submit=invalid");
                 exit();
             }
         }
@@ -83,9 +83,9 @@ if ($method === 'POST') {
     <title>Login | Rallyween</title>
 </head>
 <body>
-    <div class="signup-form absolute-centered">
+    <div class="form absolute-centered">
         <p>Admin</p>
-        <form action="login.php" method="post">
+        <form action="admin.php" method="post">
             <div class="admin">
                 <input placeholder="Username" type="text" name="username" required>
                 <input placeholder="Password" type="password" name="password" required>           

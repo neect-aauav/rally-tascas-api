@@ -1,15 +1,15 @@
-.signup-form p {
+.form p {
     text-align: center;
     font-size: 35px;
 }
 
-.signup-form > form {
+.form > form {
     display: flex;
     row-gap: 30px;
     flex-direction: column;
 }
 
-.signup-form > form input[type="text"], .signup-form > form input[type="email"], .signup-form > form input[type="password"] {
+.form > form input[type="text"], .form > form input[type="email"], .form > form input[type="password"] {
     width: 99%;
     font-size: 20px;
     border: 0;
@@ -17,11 +17,17 @@
     padding: 5px;
 }
 
-.signup-form > form select {
+.form > form select {
     border: 1px solid silver;
     background-color: white;
     font-size: 20px;
     max-width: 400px;
+}
+
+.form input[type="submit"] {
+    font-size: 20px;
+    padding: 5px;
+    border: 1px solid silver;
 }
 
 .nmec-input {
@@ -46,12 +52,6 @@
 
 .members > div:not(.add-member) {
     padding: 10px 0;
-}
-
-.signup-form input[type="submit"] {
-    font-size: 20px;
-    padding: 5px;
-    border: 1px solid silver;
 }
 
 .add-member {
