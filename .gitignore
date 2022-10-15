@@ -1,1 +1,6 @@
+#php
 app/php/secret.php
+
+# django
+neectrally/secrets.py
+venv/
