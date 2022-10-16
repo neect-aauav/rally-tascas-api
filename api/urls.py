@@ -23,4 +23,8 @@ urlpatterns = [
     path('teams', views.teams),
     # /teams/<id>
     path('teams/<slug:id>', views.teams),
+    # /bars
+    path('bars', views.bars),
+    # /bars/<id>
+    path('bars/<slug:id>', views.bars),
 ]

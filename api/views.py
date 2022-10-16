@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
-from api.models import Teams, Members
+from api.models import Teams, Members, Bars, TeamsBars
 from django.forms.models import model_to_dict
 
 import json
@@ -33,7 +33,6 @@ def teams(request, id=None):
 
                             # loop through members
                             for member in data['members']:
-                                print(member)
                                 member_object = Members(name=member['name'], course=member['course'], nmec=member['nmec'], team=team_object)
                                 member_object.save()
 
@@ -84,23 +83,24 @@ def teams(request, id=None):
             # check for other ways of team identification
             try:
                 if request.GET.get("name"):
-                    team_object = Teams.objects.get(name=request.GET.get("name"))
+                    team_objects = [Teams.objects.get(name=request.GET.get("name"))]
                 elif request.GET.get("email"):
-                    team_object = Teams.objects.get(email=request.GET.get("email"))
+                    team_objects = [Teams.objects.get(email=request.GET.get("email"))]
                 elif request.GET.get("id"):
-                    team_object = Teams.objects.get(id=request.GET.get("id"))
+                    team_objects = [Teams.objects.get(id=request.GET.get("id"))]
                 else:
-                    return Response({
-                        "status": 400,
-                        "message": f"Missing team identifier"
-                    }, status=status.HTTP_400_BAD_REQUEST)
+                    # return all teams
+                    team_objects = Teams.objects.all()
 
-                team = model_to_dict(team_object)
+                teams = []
+                for team_object in team_objects:
+                    team = model_to_dict(team_object)
 
-                # get members from this team
-                team["members"] = [model_to_dict(member) for member in Members.objects.filter(team=team['id'])]
+                    # get members from this team
+                    team["members"] = [model_to_dict(member) for member in Members.objects.filter(team=team['id'])]
+                    teams.append(team)
 
-                return Response(team, status=status.HTTP_200_OK)
+                return Response(teams[0] if len(teams) == 1 else teams, status=status.HTTP_200_OK)
             except Teams.DoesNotExist:
                 return Response({
                     "status": 400,
@@ -127,4 +127,112 @@ def teams(request, id=None):
             return Response({
                 "status": 400,
                 "message": "Missing team identifier"
+            }, status=status.HTTP_400_BAD_REQUEST) 
+        
+@api_view(["POST", "GET", "DELETE"])
+@csrf_exempt
+def bars(request, id=None):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            try:
+                try:
+                    Bars.objects.get(name=data["name"])
+
+                    # if already exists, break
+                    return Response({
+                        "status": 400,
+                        "message": f"A bar with the name {data['name']} already exists"
+                    }, status=status.HTTP_400_BAD_REQUEST)
+                except Bars.DoesNotExist:
+                    bar_object = Bars(name=data['name'], location=data['location'], picture=data['picture'])
+
+                    try:
+                        bar_object.save()
+
+                        # fill TeamsBars
+                        all_teams = Teams.objects.all()
+                        for team_object in all_teams:
+                            team_bars_assoc = TeamsBars(teamId=team_object, barId=bar_object)                        
+                            team_bars_assoc.save()
+
+                        return Response({
+                            "status": 200,
+                            "message": f"Added bar {data['name']} successfully"
+                        }, status=status.HTTP_200_OK)
+                    except Exception:
+                        bar_object.delete()
+
+                        return Response({
+                            "status": 500,
+                            "message": f"Could not add bar {data['name']}"
+                        },status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            except KeyError:
+                return Response({
+                    "status": 400,
+                    "message": "JSON Keys missing"
+                }, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError:
+            return Response({
+                "status": 400,
+                "message": "Invalid JSON format"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+    if request.method == "GET":
+        if id is not None:
+            try:
+                bar_object = Bars.objects.get(id=id)
+                bar = model_to_dict(bar_object)
+
+                return Response(bar, status=status.HTTP_200_OK) 
+            except Bars.DoesNotExist:
+                return Response({
+                    "status": 400,
+                    "message": f"There is no bar with the id {id}"
+                }, status=status.HTTP_400_BAD_REQUEST) 
+        else:
+            # check for other ways of team identification
+            try:
+                if request.GET.get("name"):
+                    bar_objects = [Bars.objects.get(name=request.GET.get("name"))]
+                elif request.GET.get("email"):
+                    bar_objects = [Bars.objects.get(email=request.GET.get("email"))]
+                elif request.GET.get("id"):
+                    bar_objects = [Bars.objects.get(id=request.GET.get("id"))]
+                else:
+                    # return all teams
+                    bar_objects = Bars.objects.all()
+
+                bars = []
+                for bar_object in bar_objects:
+                    bar = model_to_dict(bar_object)
+                    bars.append(bar)
+
+                return Response(bars[0] if len(bars) == 1 else bars, status=status.HTTP_200_OK)
+            except Teams.DoesNotExist:
+                return Response({
+                    "status": 400,
+                    "message": f"There is no bar with that identification"
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+    if request.method == "DELETE":
+        if id is not None:
+            try:
+                bar_object = Bars.objects.get(id=id)
+                bar = model_to_dict(bar_object)
+                bar_object.delete()
+
+                return Response({
+                    "status": 200,
+                    "message": f"Deleted bar {bar['name']}"
+                }, status=status.HTTP_200_OK) 
+            except Bars.DoesNotExist:
+                return Response({
+                    "status": 400,
+                    "message": f"There is no bar with the id {id}"
+                }, status=status.HTTP_400_BAD_REQUEST) 
+        else:
+            return Response({
+                "status": 400,
+                "message": "Missing bar identifier"
             }, status=status.HTTP_400_BAD_REQUEST) 

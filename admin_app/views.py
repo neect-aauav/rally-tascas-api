@@ -6,9 +6,9 @@ from rest_framework.decorators import api_view
 
 @api_view(["POST", "GET"])
 @csrf_exempt
-def signup(request):
+def login(request):
     if request.method == "GET":
-        return render(request, 'signup.html')
+        return render(request, 'admin.html')
     
     if request.method == "POST":
         try:

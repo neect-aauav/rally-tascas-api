@@ -24,5 +24,6 @@ class Bars(models.Model):
     picture = models.TextField()
 
 class TeamsBars(models.Model):
-    teamId = models.ForeignKey(Teams, on_delete=models.CASCADE)
-    barId = models.ForeignKey(Bars, on_delete=models.CASCADE)
+	teamId = models.ForeignKey(Teams, on_delete=models.CASCADE)
+	barId = models.ForeignKey(Bars, on_delete=models.CASCADE)
+	points = models.IntegerField(default=0)
