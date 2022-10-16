@@ -1,6 +1,14 @@
-#php
+# secrets #
 app/php/secret.php
-
-# django
 neectrally/secrets.py
+
+# Environments #
 venv/
+
+# Django #
+*.log
+*.pot
+*.pyc
+*/__pycache__
+db.sqlite3
+media
