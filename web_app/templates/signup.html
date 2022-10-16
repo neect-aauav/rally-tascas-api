@@ -1,0 +1,41 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/signup.css' %}">
+    <title>Signup | Rallyween</title>
+</head>
+<body>
+    <div class="form absolute-centered">
+        <p>Equipa</p>
+        <form action="signup" method="post">
+            <div class="team">
+                <input title="Atleast 3 characters" minlength="3" placeholder="Nome" type="text" name="team" required>
+                <input placeholder="Email" type="email" name="email" pattern="[^@\s]+@[^@\s]+\.[^@\s]+" required>           
+            </div>
+            <div class="members">
+                <p>Membros</p>
+                <div>
+                    <input title="Atleast 3 characters" minlength="3" placeholder="Nome" type="text" name="member[0]" required>
+                    <input title="Numbers only" pattern="\d*" class="nmec-input" placeholder="NMEC" type="text" name="nmec[0]" required>
+                    <select name="course[0]" required>
+                        <option></option>
+                    </select>
+                    <div class="remove-member inactive"><div class="absolute-centered"><div></div><div></div></div></div>
+                </div>
+                <div class="add-member clickable">+ Adicionar Membro</div>
+            </div>
+
+            <input class="clickable" type="submit" value="Criar" name="team-submit">
+        </form>
+    </div>
+    
+    <script src="{% static 'scripts/static.js' %}"></script>
+    <script src="{% static 'scripts/signup.js' %}"></script>
+</body>
+</html>
