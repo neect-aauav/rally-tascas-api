@@ -3,6 +3,8 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
+from . import views
+
 schema_view = get_schema_view(
     openapi.Info(
         title="NEECT Rally Tascas",
@@ -11,8 +13,6 @@ schema_view = get_schema_view(
     public=True,
     permission_classes=[permissions.AllowAny],
 )
-
-from . import views
 
 urlpatterns = [
     # swagger docs
