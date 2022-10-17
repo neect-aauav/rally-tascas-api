@@ -4,6 +4,9 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
+import requests
+import json
+
 @api_view(["POST", "GET"])
 @csrf_exempt
 def signup(request):
@@ -12,9 +15,30 @@ def signup(request):
     
     if request.method == "POST":
         try:
-            data = request.POST.dict()
-            print(data)
-            
+            form_data = request.POST.dict()
+            print(form_data)
+
+            # make sure this is comming from the browser form
+            if form_data["team-submit"] and form_data["team-submit"] == "Criar":
+                data = {}
+                data["team"] = form_data["team"]
+                data["email"] = form_data["email"]
+
+                other_fields = 3
+                fields_per_member = 3
+                number_members = int((len(form_data)-other_fields)/fields_per_member)
+                members = []
+                for i in range(0, number_members):
+                    members.append({
+                        "name": form_data[f"member[{i}]"],
+                        "nmec": form_data[f"nmec[{i}]"],
+                        "course": form_data[f"course[{i}]"]
+                    })
+                data["members"] = members
+                
+                host = request.build_absolute_uri.replace(request.get_full_path, "")
+                requests.post(url=host+"/api/teams", data = json.dumps(data))
+                
         except ValueError:
             return Response({
                 "status": 400,
