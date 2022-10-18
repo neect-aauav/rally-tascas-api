@@ -15,7 +15,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
         account = Account(
                 username=self.validated_data['username'],
                 is_admin=True,
-                is_active=True
+                is_active=True,
+                is_staff=True
             )
         password = self.validated_data['password']
 
