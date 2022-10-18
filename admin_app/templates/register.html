@@ -1,0 +1,28 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/signup.css' %}">
+    <title>Register</title>
+</head>
+<body>
+    <div class="form absolute-centered">
+        <p>Admin</p>
+        <form action="register" method="post">
+            <div class="admin">
+                <input placeholder="Username" type="text" name="username" required>
+                <input placeholder="Password" type="password" name="password" required>           
+            </div>
+            <input class="clickable" type="submit" value="Register" name="register-submit">
+        </form>
+    </div>
+    
+    <script src="{% static 'scripts/static.js' %}"></script>
+    <script src="{% static 'scripts/login.js' %}"></script>
+</body>
+</html>

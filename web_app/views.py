@@ -35,11 +35,11 @@ def signup(request):
                         "course": form_data[f"course[{i}]"]
                     })
                 data["members"] = members
+
+                requests.post(url="http://"+request.get_host()+"/api/teams", data=json.dumps(data))
                 
-                host = request.build_absolute_uri.replace(request.get_full_path, "")
-                requests.post(url=host+"/api/teams", data = json.dumps(data))
-                
-        except ValueError:
+                return render(request, 'signup.html')
+        except ValueError as e:
             return Response({
                 "status": 400,
                 "message": "Invalid data format"

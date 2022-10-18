@@ -13,11 +13,6 @@ class Members(models.Model):
 	points = models.IntegerField(default=0)
 	team = models.ForeignKey(Teams, on_delete=models.CASCADE)
 
-class Admin(models.Model):
-	username = models.CharField(max_length=255)
-	pwd = models.TextField()
-	timestamp = models.DateTimeField(auto_now=True)
-
 class Bars(models.Model):
     name = models.CharField(max_length=255)
     location = models.TextField()

@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'web_app',
 ]
 
+AUTH_USER_MODEL = 'admin_app.Account'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -91,6 +93,9 @@ DATABASES = {
         'USER': DB_USER,
         'PASSWORD': DB_PWD,
         'HOST': DB_HOST,
+        'OPTIONS': {
+            "init_command": "SET foreign_key_checks = 0;",
+        },
         'PORT': '3306'
     }
 }
