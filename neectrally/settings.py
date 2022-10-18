@@ -46,8 +46,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'drf_yasg',
     'api',
-    'admin_app',
-    'web_app',
+    'management',
 ]
 
 REST_FRAMEWORK = {
@@ -56,7 +55,7 @@ REST_FRAMEWORK = {
     ]
 }
 
-AUTH_USER_MODEL = 'admin_app.Account'
+AUTH_USER_MODEL = 'management.Account'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

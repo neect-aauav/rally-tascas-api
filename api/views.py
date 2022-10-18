@@ -1,3 +1,4 @@
+from cmath import isnan
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.response import Response
@@ -27,21 +28,31 @@ def teams(request, id=None):
                             "message": f"A team with the name {data['team']} already exists"
                         }, status=status.HTTP_400_BAD_REQUEST)
                     except Teams.DoesNotExist:
-                        team_object = Teams(name=data['team'], email=data['email'])
+                        team= Teams(name=data['team'], email=data['email'])
                         try:
-                            team_object.save()
+                            team.save()
 
                             # loop through members
                             for member in data['members']:
-                                member_object = Members(name=member['name'], course=member['course'], nmec=member['nmec'], team=team_object)
+                                member_object = Members(name=member['name'], course=member['course'], nmec=member['nmec'], team=team)
                                 member_object.save()
+
+                            # assoc team to bars
+                            all_bars = Bars.objects.all()
+                            for bar in all_bars:
+                                # check if the assoc already exists
+                                try:
+                                    TeamsBars.objects.get(teamId=team, barId=bar)
+                                except TeamsBars.DoesNotExist:
+                                    team_bars_assoc = TeamsBars(teamId=team, barId=bar)                        
+                                    team_bars_assoc.save()
 
                             return Response({
                                 "status": 200,
                                 "message": f"Added team {data['team']} successfully"
                             }, status=status.HTTP_200_OK)
                         except Exception as e:
-                            team_object.delete()
+                            team.delete()
 
                             return Response({
                                 "status": 500,
@@ -110,13 +121,12 @@ def teams(request, id=None):
     if request.method == "DELETE":
         if id is not None:
             try:
-                team_object = Teams.objects.get(id=id)
-                team = model_to_dict(team_object)
-                team_object.delete()
+                team= Teams.objects.get(id=id)
+                team.delete()
 
                 return Response({
                     "status": 200,
-                    "message": f"Deleted team {team['name']}"
+                    "message": f"Deleted team {team.name}"
                 }, status=status.HTTP_200_OK) 
             except Teams.DoesNotExist:
                 return Response({
@@ -145,23 +155,27 @@ def bars(request, id=None):
                         "message": f"A bar with the name {data['name']} already exists"
                     }, status=status.HTTP_400_BAD_REQUEST)
                 except Bars.DoesNotExist:
-                    bar_object = Bars(name=data['name'], location=data['location'], picture=data['picture'])
+                    bar = Bars(name=data['name'], location=data['location'], picture=data['picture'])
 
                     try:
-                        bar_object.save()
+                        bar.save()
 
                         # fill TeamsBars
                         all_teams = Teams.objects.all()
-                        for team_object in all_teams:
-                            team_bars_assoc = TeamsBars(teamId=team_object, barId=bar_object)                        
-                            team_bars_assoc.save()
+                        for team in all_teams:
+                            # check if the assoc already exists
+                            try:
+                                TeamsBars.objects.get(barId=bar, teamId=team)
+                            except TeamsBars.DoesNotExist:
+                                team_bars_assoc = TeamsBars(teamId=team, barId=bar)                        
+                                team_bars_assoc.save()
 
                         return Response({
                             "status": 200,
                             "message": f"Added bar {data['name']} successfully"
                         }, status=status.HTTP_200_OK)
                     except Exception:
-                        bar_object.delete()
+                        bar.delete()
 
                         return Response({
                             "status": 500,
@@ -218,13 +232,12 @@ def bars(request, id=None):
     if request.method == "DELETE":
         if id is not None:
             try:
-                bar_object = Bars.objects.get(id=id)
-                bar = model_to_dict(bar_object)
-                bar_object.delete()
+                bar = Bars.objects.get(id=id)
+                bar.delete()
 
                 return Response({
                     "status": 200,
-                    "message": f"Deleted bar {bar['name']}"
+                    "message": f"Deleted bar {bar.name}"
                 }, status=status.HTTP_200_OK) 
             except Bars.DoesNotExist:
                 return Response({
@@ -236,3 +249,142 @@ def bars(request, id=None):
                 "status": 400,
                 "message": "Missing bar identifier"
             }, status=status.HTTP_400_BAD_REQUEST) 
+
+
+@api_view(["POST", "GET"])
+@csrf_exempt
+def points(request, id=None, method=None):
+    if request.method == "POST":
+        if id is not None:
+            try:
+                float(id)
+            except ValueError:
+                return Response({
+                    "status": 400,
+                    "message": "Team id must be a number"
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                data = json.loads(request.body)
+                try:
+                    try:
+                        points = float(data["points"])
+                    except ValueError:
+                        return Response({
+                            "status": 400,
+                            "message": "Points must be a number"
+                        }, status=status.HTTP_400_BAD_REQUEST)
+
+                    try:
+                        team = Teams.objects.get(id=id)
+                        members = Members.objects.get(team=team)
+
+                        old_points = team.points
+                        if method is None:
+                            team.points = points
+                            message = f"Set points of team {team.name} from {old_points} to {team.points}"
+
+                            # handle members points
+                            not_handled = _handle_points(data, members, "add")
+                            if not_handled is not None:
+                                return not_handled
+                        else:
+                            if method == "add":
+                                team.points = team.points+points
+                                message = f"Added {points} points to team {team.name}. Team's ballance went from {old_points} to {team.points}"
+                            if method == "remove":
+                                team.points = team.points-points
+                                message = f"Removed {points} points from team {team.name}. Team's ballance went from {old_points} to {team.points}"
+
+                            # handle members points
+                            not_handled = _handle_points(data, members, method)
+                            if not_handled is not None:
+                                return not_handled
+
+                        team.save()
+
+                        return Response({
+                            "status": 200,
+                            "message": message,
+                            "points": team.points
+                        }, status=status.HTTP_200_OK)
+
+                    except Teams.DoesNotExist:
+                        return Response({
+                            "status": 400,
+                            "message": f"A team with the id {id} doesn't exist"
+                        },status=status.HTTP_400_BAD_REQUEST)
+
+                except KeyError:
+                    return Response({
+                        "status": 400,
+                        "message": "JSON Keys missing"
+                    }, status=status.HTTP_400_BAD_REQUEST)
+            except ValueError:
+                return Response({
+                    "status": 400,
+                    "message": "Invalid JSON format"
+                }, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({
+                "status": 400,
+                "message": "Missing team ID"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+    if request.method == "GET":
+        if id is not None:
+            try:
+                float(id)
+            except ValueError:
+                return Response({
+                    "status": 400,
+                    "message": "Team id must be a number"
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                team = Teams.objects.get(id=id)
+                return Response({"points": team.points}, status=status.HTTP_200_OK)
+
+            except Teams.DoesNotExist:
+                return Response({
+                    "status": 400,
+                    "message": f"A team with the id {id} doesn't exist"
+                },status=status.HTTP_400_BAD_REQUEST)
+
+
+def _handle_points(data, members, method):
+        if "members" in data:
+            not_distributed = _distribute_points(data["members"], "add")
+            if not_distributed is not None:
+                return not_distributed
+        else:
+            # split points equally
+            member_points = points/len(members)
+            for member in members:
+                member.points += member_points
+
+def _distribute_points(members, method):
+    for member_id in members:
+        if "id" in member_id:
+            member = Members.objects.get(id=id["id"])
+        elif "nmec" in member_id:
+            member = Members.objects.get(nmec=member_id["nmec"])
+        else:
+            return Response({
+                "status": 400,
+                "message": "Missing valid member identification"
+            },status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            member_points = float(member_id["points"])
+        except ValueError:
+            return Response({
+                "status": 400,
+                "message": "Member points must be a number"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if method == "add":
+            member.points += member_points
+        
+        if method == "remove":
+            member.points -= member_points

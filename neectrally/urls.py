@@ -20,8 +20,4 @@ urlpatterns = [
     path('django/admin/', admin.site.urls),
     # api
     path('api/', include('api.urls')),
-    # admin
-    path('admin/', include('admin_app.urls')),
-    # web app
-    path('', include('web_app.urls'))
 ]

@@ -25,12 +25,3 @@ def register(request):
                 "status": 400,
                 "message": "Something went wrong... Could not create admin user"
             }, status=status.HTTP_400_BAD_REQUEST)
-        
-    if request.method == "GET":
-        return render(request, 'register.html')
-
-@api_view(["GET"])
-@csrf_exempt
-def login(request):
-    if request.method == "GET":
-        return render(request, 'admin.html')
