@@ -39,6 +39,14 @@ urlpatterns = [
     path('points/<slug:id>', views.points),
     # /points/<id>/<{add, remove}>
     path('points/<slug:id>/<slug:method>', views.points),
-    # /qrcode/<id>
-    path('qrcode/<slug:id>', views.qrcodes)
+    # /qrcodes/<id>
+    path('qrcodes/<slug:id>', views.qrcodes),
+    # /games
+    path('games', views.games),
+    # /games/<id>
+    path('games/<slug:id>', views.games),
+    # /prizes
+    path('prizes', views.prizes),
+    # /prizes/<id>
+    path('prizes/<slug:id>', views.prizes),
 ]

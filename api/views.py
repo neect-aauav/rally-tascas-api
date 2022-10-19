@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
-from api.models import Teams, Members, Bars, TeamsBars
+from api.models import Teams, Members, Bars, TeamsBars, Games, Prizes
 from django.forms.models import model_to_dict
 
 from qrcode.image.styledpil import StyledPilImage
@@ -148,7 +148,8 @@ def teams(request, id=None):
                 "status": 400,
                 "message": "Missing team identifier"
             }, status=status.HTTP_400_BAD_REQUEST) 
-        
+
+
 @api_view(["POST", "GET", "DELETE"])
 @csrf_exempt
 def bars(request, id=None):
@@ -219,8 +220,6 @@ def bars(request, id=None):
             try:
                 if request.GET.get("name"):
                     bar_objects = [Bars.objects.get(name=request.GET.get("name"))]
-                elif request.GET.get("email"):
-                    bar_objects = [Bars.objects.get(email=request.GET.get("email"))]
                 elif request.GET.get("id"):
                     bar_objects = [Bars.objects.get(id=request.GET.get("id"))]
                 else:
@@ -233,7 +232,7 @@ def bars(request, id=None):
                     bars.append(bar)
 
                 return Response(bars[0] if len(bars) == 1 else bars, status=status.HTTP_200_OK)
-            except Teams.DoesNotExist:
+            except Bars.DoesNotExist:
                 return Response({
                     "status": 400,
                     "message": f"There is no bar with that identification"
@@ -414,6 +413,208 @@ def qrcodes(request, id=None):
         }, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(["POST", "GET", "DELETE"])
+@csrf_exempt
+def games(request, id=None):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            try:
+                try:
+                    Games.objects.get(name=data["name"])
+
+                    # if already exists, break
+                    return Response({
+                        "status": 400,
+                        "message": f"A game with the name {data['name']} already exists"
+                    }, status=status.HTTP_400_BAD_REQUEST)
+                except Games.DoesNotExist:
+                    game = Games(name=data['name'], description=data['description'], points=data['points'])
+
+                    try:
+                        game.save()
+
+                        return Response({
+                            "status": 200,
+                            "message": f"Added game {data['name']} successfully"
+                        }, status=status.HTTP_200_OK)
+                    except Exception:
+                        game.delete()
+
+                        return Response({
+                            "status": 500,
+                            "message": f"Could not add game {data['name']}"
+                        },status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            except KeyError:
+                return Response({
+                    "status": 400,
+                    "message": "JSON Keys missing"
+                }, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError:
+            return Response({
+                "status": 400,
+                "message": "Invalid JSON format"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+    if request.method == "GET":
+        if id is not None:
+            try:
+                game_object = Games.objects.get(id=id)
+                game = model_to_dict(game_object)
+
+                return Response(game, status=status.HTTP_200_OK) 
+            except Games.DoesNotExist:
+                return Response({
+                    "status": 400,
+                    "message": f"There is no game with the id {id}"
+                }, status=status.HTTP_400_BAD_REQUEST) 
+        else:
+            # check for other ways of game identification
+            try:
+                if request.GET.get("name"):
+                    game_objects= [Games.objects.get(name=request.GET.get("name"))]
+                elif request.GET.get("id"):
+                    game_objects = [Games.objects.get(id=request.GET.get("id"))]
+                else:
+                    # return all teams
+                    game_objects = Games.objects.all()
+
+                games = []
+                for game_object in game_objects:
+                    game = model_to_dict(game_object)
+                    games.append(game)
+
+                return Response(games[0] if len(games) == 1 else games, status=status.HTTP_200_OK)
+            except Games.DoesNotExist:
+                return Response({
+                    "status": 400,
+                    "message": f"There is no bar with that identification"
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+    if request.method == "DELETE":
+        if id is not None:
+            try:
+                game = Games.objects.get(id=id)
+                game.delete()
+
+                return Response({
+                    "status": 200,
+                    "message": f"Deleted game {game.name}"
+                }, status=status.HTTP_200_OK) 
+            except Games.DoesNotExist:
+                return Response({
+                    "status": 400,
+                    "message": f"There is no game with the id {id}"
+                }, status=status.HTTP_400_BAD_REQUEST) 
+        else:
+            return Response({
+                "status": 400,
+                "message": "Missing game identifier"
+            }, status=status.HTTP_400_BAD_REQUEST) 
+
+
+@api_view(["POST", "GET", "DELETE"])
+@csrf_exempt
+def prizes(request, id=None):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            try:
+                try:
+                    Prizes.objects.get(name=data["name"])
+
+                    # if already exists, break
+                    return Response({
+                        "status": 400,
+                        "message": f"A prize with the name {data['name']} already exists"
+                    }, status=status.HTTP_400_BAD_REQUEST)
+                except Prizes.DoesNotExist:
+                    prize = Prizes(name=data['name'], place=data['place'], ammount=data['ammount'])
+
+                    try:
+                        prize.save()
+
+                        return Response({
+                            "status": 200,
+                            "message": f"Added prize {data['name']} successfully"
+                        }, status=status.HTTP_200_OK)
+                    except Exception:
+                        prize.delete()
+
+                        return Response({
+                            "status": 500,
+                            "message": f"Could not add prize {data['name']}"
+                        },status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            except KeyError:
+                return Response({
+                    "status": 400,
+                    "message": "JSON Keys missing"
+                }, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError:
+            return Response({
+                "status": 400,
+                "message": "Invalid JSON format"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+    if request.method == "GET":
+        if id is not None:
+            try:
+                prize_object = Games.objects.get(id=id)
+                prize = model_to_dict(prize_object)
+
+                return Response(prize, status=status.HTTP_200_OK) 
+            except Prizes.DoesNotExist:
+                return Response({
+                    "status": 400,
+                    "message": f"There is no prize with the id {id}"
+                }, status=status.HTTP_400_BAD_REQUEST) 
+        else:
+            # check for other ways of game identification
+            try:
+                if request.GET.get("name"):
+                    prize_objects = [Prizes.objects.get(name=request.GET.get("name"))]
+                elif request.GET.get("id"):
+                    prize_objects = [Prizes.objects.get(id=request.GET.get("id"))]
+                elif request.GET.get("place"):
+                    prize_objects = [Prizes.objects.get(place=request.GET.get("place"))]
+                else:
+                    # return all teams
+                    prize_objects = Prizes.objects.all()
+
+                prizes = []
+                for prize_object in prize_objects:
+                    prize = model_to_dict(prize_object)
+                    prizes.append(prize)
+
+                return Response(prizes[0] if len(prizes) == 1 else prizes, status=status.HTTP_200_OK)
+            except Prizes.DoesNotExist:
+                return Response({
+                    "status": 400,
+                    "message": f"There is no bar with that identification"
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+    if request.method == "DELETE":
+        if id is not None:
+            try:
+                prize = Prizes.objects.get(id=id)
+                prize.delete()
+
+                return Response({
+                    "status": 200,
+                    "message": f"Deleted prize {prize.name}"
+                }, status=status.HTTP_200_OK) 
+            except Prizes.DoesNotExist:
+                return Response({
+                    "status": 400,
+                    "message": f"There is no prize with the id {id}"
+                }, status=status.HTTP_400_BAD_REQUEST) 
+        else:
+            return Response({
+                "status": 400,
+                "message": "Missing prize identifier"
+            }, status=status.HTTP_400_BAD_REQUEST) 
+
+
 def _handle_points(data, members, method):
         if "members" in data:
             # check if points of each member matches overall points
@@ -464,13 +665,11 @@ def _distribute_points(members, method):
 
 def _operate_points(points, value, method):
         if method == "add":
-            points += value
+            return points + value
         elif method == "remove":
-            points -= value
+            return points - value
         elif method == "set":
-            points = value
-        else:
-            points = points
+            return value
 
         return points
 
