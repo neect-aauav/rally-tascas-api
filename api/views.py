@@ -101,7 +101,7 @@ def teams(request, id=None):
             try:
                 if request.GET.get("name"):
                     team_objects = [Teams.objects.get(name=request.GET.get("name"))]
-                elif request.GET.get("ePOSTmail"):
+                elif request.GET.get("email"):
                     team_objects = [Teams.objects.get(email=request.GET.get("email"))]
                 elif request.GET.get("id"):
                     team_objects = [Teams.objects.get(id=request.GET.get("id"))]
@@ -148,6 +148,125 @@ def teams(request, id=None):
                 "status": 400,
                 "message": "Missing team identifier"
             }, status=status.HTTP_400_BAD_REQUEST) 
+
+
+@api_view(["POST", "GET", "DELETE"])
+@csrf_exempt
+def members(request, id=None):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            try:
+                try:
+                    Members.objects.get(nmec=data["nmec"])
+
+                    # if already exists, break
+                    return Response({
+                        "status": 400,
+                        "message": f"A member with the nmec {data['nmec']} already exists"
+                    }, status=status.HTTP_400_BAD_REQUEST)
+                except Members.DoesNotExist:
+                    try:
+                        team = Teams.objects.get(id=float(data['team']))
+                    except ValueError:
+                        return Response({
+                            "status": 400,
+                            "message": "Team id must be a number"
+                        }, status=status.HTTP_400_BAD_REQUEST)
+
+                    member = Members(name=data['name'], nmec=data['nmec'], course=data['course'], team=team)
+
+                    try:
+                        member.save()
+
+                        return Response({
+                            "status": 200,
+                            "message": f"Added member {data['name']} successfully to team {team.id}"
+                        }, status=status.HTTP_200_OK)
+                    except Exception:
+                        member.delete()
+
+                        return Response({
+                            "status": 500,
+                            "message": f"Could not add member {data['name']}"
+                        },status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            except KeyError:
+                return Response({
+                    "status": 400,
+                    "message": "JSON Keys missing"
+                }, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError:
+            return Response({
+                "status": 400,
+                "message": "Invalid JSON format"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+    if request.method == "GET":
+        if id is not None:
+            try:
+                member_object = Members.objects.get(id=id)
+                member = model_to_dict(member_object)
+
+                # get team from this member
+                member["team"] = model_to_dict(member_object.team)
+
+                return Response(member, status=status.HTTP_200_OK) 
+            except Teams.DoesNotExist:
+                return Response({
+                    "status": 400,
+                    "message": f"There is no member with the id {id}"
+                }, status=status.HTTP_400_BAD_REQUEST) 
+        else:
+            # check for other ways of member identification
+            try:
+                if request.GET.get("name"):
+                    member_objects = [Members.objects.get(name=request.GET.get("name"))]
+                elif request.GET.get("nmec"):
+                    member_objects = [Members.objects.get(email=request.GET.get("nmec"))]
+                elif request.GET.get("id"):
+                    member_objects = [Members.objects.get(id=request.GET.get("id"))]
+                elif request.GET.get("course"):
+                    member_objects = Members.objects.filter(id=request.GET.get("course"))
+                else:
+                    # return all members
+                    member_objects = Members.objects.all()
+
+                members = []
+                for member_object in member_objects:
+                    member = model_to_dict(member_object)
+
+                    # get team from this member
+                    member["team"] = model_to_dict(member_object.team)
+                    members.append(member)
+
+                return Response(members[0] if len(members) == 1 else members, status=status.HTTP_200_OK)
+            except Teams.DoesNotExist:
+                return Response({
+                    "status": 400,
+                    "message": f"There is no member with that identification"
+                }, status=status.HTTP_400_BAD_REQUEST) 
+
+    if request.method == "DELETE":
+        if id is not None:
+            try:
+                member = Members.objects.get(id=id)
+                member.delete()
+
+                return Response({
+                    "status": 200,
+                    "message": f"Deleted member {member.name} from team {member.team.name}"
+                }, status=status.HTTP_200_OK) 
+            except Members.DoesNotExist:
+                return Response({
+                    "status": 400,
+                    "message": f"There is no member with the id {id}"
+                }, status=status.HTTP_400_BAD_REQUEST) 
+        else:
+            return Response({
+                "status": 400,
+                "message": "Missing member identifier"
+            }, status=status.HTTP_400_BAD_REQUEST) 
+            
 
 
 @api_view(["POST", "GET", "DELETE"])

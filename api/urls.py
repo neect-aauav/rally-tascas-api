@@ -31,6 +31,10 @@ urlpatterns = [
     path('teams', views.teams),
     # /teams/<id>
     path('teams/<slug:id>', views.teams),
+    # /members
+    path('members', views.members),
+    # /members/<id>
+    path('members/<slug:id>', views.members),
     # /bars
     path('bars', views.bars),
     # /bars/<id>
