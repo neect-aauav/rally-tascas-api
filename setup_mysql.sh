@@ -88,51 +88,48 @@ while getopts "dhsr:n:u:p:" arg; do
 	esac
 done
 
-# check if mysql is installed
-# https://unix.stackexchange.com/a/79631
-# if [ -f /etc/init.d/mysql* ] ; then
-# 	echo "MySQL present."
-# else
-# 	install_mysql() {
-# 		if [[ "${SKIP_PROMPTS}" == "true" ]] ; then
-# 			echo "Y" | sudo apt install mysql-server
-# 		else
-# 			sudo apt install mysql-server
-# 		fi
+install_mysql() {
+	if [[ "${SKIP_PROMPTS}" == "true" ]] ; then
+		echo "Y" | sudo apt install mysql-server
+	else
+		sudo apt install mysql-server
+	fi
 
-# 		if [[ "${SKIP_PROMPTS}" == "false" ]] ; then
-# 			read -p "Setup MySQL root password? [Y/n] "
-# 			if [[ $REPLY =~ ^[Yy]$ ]] || [[ $REPLY == '' ]] ; then
-# 				sudo mysql_secure_installation
-# 			fi
-# 		fi
+	if [[ "${SKIP_PROMPTS}" == "false" ]] ; then
+		read -p "Setup MySQL root password? [Y/n] "
+		if [[ $REPLY =~ ^[Yy]$ ]] || [[ $REPLY == '' ]] ; then
+			sudo mysql_secure_installation
+		fi
+	fi
 
-# 		# skip grant tables to make root use mysql_native_password
-# 		echo ""; echo "Skipping grant tables to make root use 'mysql_native_password'..."
-		
-# 		MYCNF=/etc/mysql/my.cnf
-# 		echo "" | sudo tee -a "${MYCNF}" > /dev/null
-# 		echo "[mysqld]" | sudo tee -a "${MYCNF}" > /dev/null
-# 		echo "skip-grant-tables" | sudo tee -a "${MYCNF}" > /dev/null
-# 		sudo systemctl restart mysql
-# 		SKIP_GRANT_TABLES="true"
-
-# 		QUERY="USE mysql; UPDATE user SET plugin='mysql_native_password' WHERE User='root'; FLUSH PRIVILEGES;"
-# 		echo "Query: $QUERY"
-# 		mysql -e "$QUERY"	
-# 	}
+	# skip grant tables to make root use mysql_native_password
+	echo ""; echo "Skipping grant tables to make root use 'mysql_native_password'..."
 	
-# 	if [[ "${SKIP_PROMPTS}" == "false" ]] ; then
-# 		read -p "MySQL is not installed. Install it now? [Y/n] "
-# 		if [[ $REPLY =~ ^[Yy]$ ]] || [[ $REPLY == '' ]] ; then
-# 			install_mysql
-# 		else
-# 			exit 1
-# 		fi
-# 	else
-# 		install_mysql
-# 	fi
-# fi
+	MYCNF=/etc/mysql/my.cnf
+	echo "" | sudo tee -a "${MYCNF}" > /dev/null
+	echo "[mysqld]" | sudo tee -a "${MYCNF}" > /dev/null
+	echo "skip-grant-tables" | sudo tee -a "${MYCNF}" > /dev/null
+	sudo systemctl restart mysql
+	SKIP_GRANT_TABLES="true"
+
+	QUERY="USE mysql; UPDATE user SET plugin='mysql_native_password' WHERE User='root'; FLUSH PRIVILEGES;"
+	echo "Query: $QUERY"
+	mysql -e "$QUERY"	
+}
+
+# check if mysql is installed
+if [ -x "$(command -v mysql)" ]; then
+	echo "MySQL present."
+else
+	if [[ "${SKIP_PROMPTS}" == "false" ]] ; then
+		read -p "MySQL is not installed. Install it now? [Y/n] "
+		if [[ $REPLY =~ ^[Yy]$ ]] || [[ $REPLY == '' ]] ; then
+			install_mysql
+		fi
+	else
+		install_mysql
+	fi
+fi
 
 # setup database
 if [[ "${DEFAULTS}" == "false" ]] ; then
