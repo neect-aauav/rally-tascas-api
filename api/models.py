@@ -4,6 +4,7 @@ class Teams(models.Model):
 	name = models.CharField(max_length=255)
 	email = models.CharField(max_length=255)
 	points = models.IntegerField(default=0)
+	qr_code = models.CharField(max_length=255, default="")
 	timestamp = models.DateTimeField(auto_now=True)
 
 class Members(models.Model):

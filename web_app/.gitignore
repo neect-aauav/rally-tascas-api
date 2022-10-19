@@ -3,6 +3,7 @@ app/php/secret.php
 
 # Environments #
 venv/
+.venv/
 
 # Django #
 neectrally/secrets.py

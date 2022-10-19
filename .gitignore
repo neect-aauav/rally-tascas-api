@@ -4,6 +4,7 @@ neectrally/secrets.py
 
 # Environments #
 venv/
+.venv/
 
 # Django #
 *.log
