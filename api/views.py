@@ -277,35 +277,44 @@ def points(request, id=None, method=None):
 
                     try:
                         team = Teams.objects.get(id=id)
-                        members = Members.objects.get(team=team)
+                        members = Members.objects.filter(team=team)
 
-                        old_points = team.points
                         if method is None:
-                            team.points = points
-                            message = f"Set points of team {team.name} from {old_points} to {team.points}"
+                            method = "set"
 
-                            # handle members points
-                            not_handled = _handle_points(data, members, "add")
-                            if not_handled is not None:
-                                return not_handled
-                        else:
-                            if method == "add":
-                                team.points = team.points+points
-                                message = f"Added {points} points to team {team.name}. Team's ballance went from {old_points} to {team.points}"
-                            if method == "remove":
-                                team.points = team.points-points
-                                message = f"Removed {points} points from team {team.name}. Team's ballance went from {old_points} to {team.points}"
+                        # handle teams points
+                        old_points = team.points
+                        team.points = _operate_points(team.points, points, method)
 
-                            # handle members points
-                            not_handled = _handle_points(data, members, method)
-                            if not_handled is not None:
-                                return not_handled
+                        # handle members points
+                        not_handled = _handle_points(data, members, method)
+                        if not_handled is not None:
+                            return not_handled
+
+                        # association team <-> bar
+                        try:
+                            bar = Bars.objects.get(id=data["bar"])
+                            team_bar_assoc = TeamsBars.objects.get(teamId=team, barId=bar)
+                            team_bar_assoc.points = _operate_points(team_bar_assoc.points, team.points, method)
+                            team_bar_assoc.save()
+                        except Bars.DoesNotExist:
+                            return Response({
+                                "status": 400,
+                                "message": f"A bar with the id {data['bar']} doesn't exist"
+                            },status=status.HTTP_400_BAD_REQUEST)
 
                         team.save()
 
+                        if method == "add":
+                            message = f"Added {points} points to team {team.name}. Team's ballance went from {old_points} to {team.points}"
+                        if method == "remove":
+                            message = f"Removed {points} points from team {team.name}. Team's ballance went from {old_points} to {team.points}"
+                        if method == "set":
+                            message = f"Set points of team {team.name} from {old_points} to {team.points}"
+
                         return Response({
                             "status": 200,
-                            "message": message,
+                            "message": f"{bar.name}: {message}",
                             "points": team.points
                         }, status=status.HTTP_200_OK)
 
@@ -354,14 +363,28 @@ def points(request, id=None, method=None):
 
 def _handle_points(data, members, method):
         if "members" in data:
-            not_distributed = _distribute_points(data["members"], "add")
+            # check if points of each member matches overall points
+            try:
+                members_points = sum([float(member["points"]) for member in data["members"]])
+                if members_points != data["points"]:
+                    return Response({
+                        "status": 400,
+                        "message": "Number of overall points must be the same of all the points from members"
+                    }, status=status.HTTP_400_BAD_REQUEST)
+            except ValueError:
+                return Response({
+                    "status": 400,
+                    "message": "Member points must be a number"
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            not_distributed = _distribute_points(data["members"], method)
             if not_distributed is not None:
                 return not_distributed
         else:
             # split points equally
-            member_points = points/len(members)
             for member in members:
-                member.points += member_points
+                member.points = _operate_points(member.points, data["points"]/len(members), method)
+                member.save()
 
 def _distribute_points(members, method):
     for member_id in members:
@@ -383,8 +406,17 @@ def _distribute_points(members, method):
                 "message": "Member points must be a number"
             }, status=status.HTTP_400_BAD_REQUEST)
 
+        member.points = _operate_points(member.points, member_points, method)
+        member.save()
+
+def _operate_points(points, value, method):
         if method == "add":
-            member.points += member_points
-        
-        if method == "remove":
-            member.points -= member_points
+            points += value
+        elif method == "remove":
+            points -= value
+        elif method == "set":
+            points = value
+        else:
+            points = points
+
+        return points
