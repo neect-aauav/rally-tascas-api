@@ -24,8 +24,6 @@ def teams(request, id=None):
             data = json.loads(request.body)
             try:
                 if len(data["members"]) > 0:
-                    print(data)
-
                     try:
                         Teams.objects.get(name=data["team"])
 
@@ -36,17 +34,16 @@ def teams(request, id=None):
                         }, status=status.HTTP_400_BAD_REQUEST)
                     except Teams.DoesNotExist:
                         try:
-                            team_object = Teams(name=data['team'], email=data['email'])
-                            team_object.save()
+                            team = Teams(name=data['team'], email=data['email'])
+                            team.save()
 
                             # loop through members
                             for member in data['members']:
                                 member_object = Members(name=member['name'], course=member['course'], nmec=member['nmec'], team=team)
                                 member_object.save()
 
-
                             # qr code generation
-                            qr_name = f'qr_team{team_object.id}.png'
+                            qr_name = f'qrcodes/qr_team{team.id}.png'
                             path = f'{BASE_DIR}/static/{qr_name}'
 
                             l = [RadialGradiantColorMask(), SquareGradiantColorMask(), HorizontalGradiantColorMask(), VerticalGradiantColorMask()]
@@ -60,16 +57,16 @@ def teams(request, id=None):
 
                             img = qr.make_image(image_factory=StyledPilImage, color_mask=l[random.randint(0,3)])
                             img.save(path)
+                            team.qr_code = qr_name
 
-                            team_object.qr_code = qr_name
-                            team_object.save()
+                            team.save()
                             
                             return Response({
                                 "status": 200,
                                 "message": f"Added team {data['team']} successfully"
                             }, status=status.HTTP_200_OK)
                         except Exception as e:
-                            # team_object.delete()
+                            team.delete()
 
                             return Response({
                                 "status": 500,
