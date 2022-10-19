@@ -7,7 +7,14 @@ from rest_framework.decorators import api_view
 from api.models import Teams, Members, Bars, TeamsBars
 from django.forms.models import model_to_dict
 
+from qrcode.image.styledpil import StyledPilImage
+from qrcode.image.styles.colormasks import *
+
+from neectrally.settings import BASE_DIR
+
 import json
+import qrcode
+import random
 
 @api_view(["POST", "GET", "DELETE"])
 @csrf_exempt
@@ -28,31 +35,41 @@ def teams(request, id=None):
                             "message": f"A team with the name {data['team']} already exists"
                         }, status=status.HTTP_400_BAD_REQUEST)
                     except Teams.DoesNotExist:
-                        team= Teams(name=data['team'], email=data['email'])
                         try:
-                            team.save()
+                            team_object = Teams(name=data['team'], email=data['email'])
+                            team_object.save()
 
                             # loop through members
                             for member in data['members']:
                                 member_object = Members(name=member['name'], course=member['course'], nmec=member['nmec'], team=team)
                                 member_object.save()
 
-                            # assoc team to bars
-                            all_bars = Bars.objects.all()
-                            for bar in all_bars:
-                                # check if the assoc already exists
-                                try:
-                                    TeamsBars.objects.get(teamId=team, barId=bar)
-                                except TeamsBars.DoesNotExist:
-                                    team_bars_assoc = TeamsBars(teamId=team, barId=bar)                        
-                                    team_bars_assoc.save()
 
+                            # qr code generation
+                            qr_name = f'qr_team{team_object.id}.png'
+                            path = f'{BASE_DIR}/static/{qr_name}'
+
+                            l = [RadialGradiantColorMask(), SquareGradiantColorMask(), HorizontalGradiantColorMask(), VerticalGradiantColorMask()]
+                            
+                            qr = qrcode.QRCode(
+                                version=1,
+                                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                                border=2
+                            )
+                            qr.add_data('http://127.0.0.1:8000/api/docs/')
+
+                            img = qr.make_image(image_factory=StyledPilImage, color_mask=l[random.randint(0,3)])
+                            img.save(path)
+
+                            team_object.qr_code = qr_name
+                            team_object.save()
+                            
                             return Response({
                                 "status": 200,
                                 "message": f"Added team {data['team']} successfully"
                             }, status=status.HTTP_200_OK)
                         except Exception as e:
-                            team.delete()
+                            # team_object.delete()
 
                             return Response({
                                 "status": 500,
@@ -69,10 +86,11 @@ def teams(request, id=None):
                     "status": 400,
                     "message": "JSON Keys missing"
                 }, status=status.HTTP_400_BAD_REQUEST)
-        except ValueError:
+        except ValueError as e:
             return Response({
                 "status": 400,
-                "message": "Invalid JSON format"
+                "message": "Invalid JSON format",
+                "error": str(e)
             }, status=status.HTTP_400_BAD_REQUEST)
     
     if request.method == "GET":
@@ -95,7 +113,7 @@ def teams(request, id=None):
             try:
                 if request.GET.get("name"):
                     team_objects = [Teams.objects.get(name=request.GET.get("name"))]
-                elif request.GET.get("email"):
+                elif request.GET.get("ePOSTmail"):
                     team_objects = [Teams.objects.get(email=request.GET.get("email"))]
                 elif request.GET.get("id"):
                     team_objects = [Teams.objects.get(id=request.GET.get("id"))]
