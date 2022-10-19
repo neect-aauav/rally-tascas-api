@@ -15,6 +15,7 @@ from neectrally.settings import BASE_DIR
 import json
 import qrcode
 import random
+import os
 
 @api_view(["POST", "GET", "DELETE"])
 @csrf_exempt
@@ -45,19 +46,9 @@ def teams(request, id=None):
                             # qr code generation
                             qr_name = f'qrcodes/qr_team{team.id}.png'
                             path = f'{BASE_DIR}/static/{qr_name}'
+                            team.qr_code = f'http://{request.get_host()}/{qr_name}'
 
-                            l = [RadialGradiantColorMask(), SquareGradiantColorMask(), HorizontalGradiantColorMask(), VerticalGradiantColorMask()]
-                            
-                            qr = qrcode.QRCode(
-                                version=1,
-                                error_correction=qrcode.constants.ERROR_CORRECT_L,
-                                border=2
-                            )
-                            qr.add_data('http://127.0.0.1:8000/api/docs/')
-
-                            img = qr.make_image(image_factory=StyledPilImage, color_mask=l[random.randint(0,3)])
-                            img.save(path)
-                            team.qr_code = qr_name
+                            _generate_qrcode(path, 'http://127.0.0.1:8000/api/docs/')
 
                             team.save()
                             
@@ -137,6 +128,10 @@ def teams(request, id=None):
         if id is not None:
             try:
                 team= Teams.objects.get(id=id)
+
+                # delete qrcode
+                os.remove(f'{BASE_DIR}/static/qrcodes/qr_team{team.id}.png')
+
                 team.delete()
 
                 return Response({
@@ -269,8 +264,8 @@ def bars(request, id=None):
 @api_view(["POST", "GET"])
 @csrf_exempt
 def points(request, id=None, method=None):
-    if request.method == "POST":
-        if id is not None:
+    if id is not None:
+        if request.method == "POST":
             try:
                 float(id)
             except ValueError:
@@ -349,14 +344,8 @@ def points(request, id=None, method=None):
                     "status": 400,
                     "message": "Invalid JSON format"
                 }, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({
-                "status": 400,
-                "message": "Missing team ID"
-            }, status=status.HTTP_400_BAD_REQUEST)
 
-    if request.method == "GET":
-        if id is not None:
+        if request.method == "GET":
             try:
                 float(id)
             except ValueError:
@@ -374,6 +363,55 @@ def points(request, id=None, method=None):
                     "status": 400,
                     "message": f"A team with the id {id} doesn't exist"
                 },status=status.HTTP_400_BAD_REQUEST)
+    
+    else:
+        return Response({
+            "status": 400,
+            "message": "Missing team ID"
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["POST", "GET", "DELETE"])
+@csrf_exempt
+def qrcodes(request, id=None):
+    if id is not None:
+        try:
+            team = Teams.objects.get(id=id)
+
+            # generate qrcode
+            if request.method == "POST":
+                qr_name = f'qrcodes/qr_team{id}.png'
+                path = f'{BASE_DIR}/static/{qr_name}'
+
+                _generate_qrcode(path, 'http://127.0.0.1:8000/api/docs/')
+
+                return Response({
+                    "status": 200,
+                    "message": f"Created qrcode at {qr_name} for team {team.id}"
+                },status=status.HTTP_200_OK)
+
+            # get qrcode path
+            if request.method == "GET":
+                return Response({"qrcode": team.qr_code}, status=status.HTTP_200_OK)
+
+            if request.method == "DELETE":
+                os.remove(f'{BASE_DIR}/static/qrcodes/qr_team{team.id}.png')
+                
+                return Response({
+                    "status": 200,
+                    "message": f"Deleted qrcode for team {team.id}"
+                },status=status.HTTP_200_OK)
+
+        except Teams.DoesNotExist:
+            return Response({
+                "status": 400,
+                "message": f"A team with the id {id} doesn't exist"
+            },status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response({
+            "status": 400,
+            "message": "Missing team ID"
+        }, status=status.HTTP_400_BAD_REQUEST)
 
 
 def _handle_points(data, members, method):
@@ -435,3 +473,17 @@ def _operate_points(points, value, method):
             points = points
 
         return points
+
+
+def _generate_qrcode(path, data):
+    l = [RadialGradiantColorMask(), SquareGradiantColorMask(), HorizontalGradiantColorMask(), VerticalGradiantColorMask()]
+    
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        border=2
+    )
+    qr.add_data(data)
+
+    img = qr.make_image(image_factory=StyledPilImage, color_mask=l[random.randint(0,3)])
+    img.save(path)
