@@ -1,10 +1,9 @@
-from cmath import isnan
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
-from api.models import Teams, Members, Bars, TeamsBars, Games, Prizes
+from api.models import MembersBars, Teams, Members, Bars, TeamsBars, Games, Prizes
 from django.forms.models import model_to_dict
 
 from qrcode.image.styledpil import StyledPilImage
@@ -16,6 +15,7 @@ import json
 import qrcode
 import random
 import os
+import requests
 
 @api_view(["POST", "GET", "DELETE"])
 @csrf_exempt
@@ -40,8 +40,19 @@ def teams(request, id=None):
 
                             # loop through members
                             for member in data['members']:
-                                member_object = Members(name=member['name'], course=member['course'], nmec=member['nmec'], team=team)
-                                member_object.save()
+                                member["team"] = team.id
+                                print(member)
+                                requests.post(f'http://{request.get_host()}/api/members', json=member)
+
+                            # create assoc team <-> bars
+                            all_bars = Bars.objects.all()
+                            for bar in all_bars:
+                                # check if the assoc already exists
+                                try:
+                                    TeamsBars.objects.get(barId=bar, teamId=team)
+                                except TeamsBars.DoesNotExist:
+                                    team_bars_assoc = TeamsBars(teamId=team, barId=bar)                        
+                                    team_bars_assoc.save()
 
                             # qr code generation
                             qr_name = f'qrcodes/qr_team{team.id}.png'
@@ -84,11 +95,7 @@ def teams(request, id=None):
     if request.method == "GET":
         if id is not None:
             try:
-                team_object = Teams.objects.get(id=id)
-                team = model_to_dict(team_object)
-
-                # get members from this team
-                team["members"] = [model_to_dict(member) for member in Members.objects.filter(team=id)]
+                team = _get_team(Teams.objects.get(id=id))
 
                 return Response(team, status=status.HTTP_200_OK) 
             except Teams.DoesNotExist:
@@ -109,13 +116,7 @@ def teams(request, id=None):
                     # return all teams
                     team_objects = Teams.objects.all()
 
-                teams = []
-                for team_object in team_objects:
-                    team = model_to_dict(team_object)
-
-                    # get members from this team
-                    team["members"] = [model_to_dict(member) for member in Members.objects.filter(team=team['id'])]
-                    teams.append(team)
+                teams = [_get_team(team_object) for team_object in team_objects]
 
                 return Response(teams[0] if len(teams) == 1 else teams, status=status.HTTP_200_OK)
             except Teams.DoesNotExist:
@@ -149,6 +150,29 @@ def teams(request, id=None):
                 "message": "Missing team identifier"
             }, status=status.HTTP_400_BAD_REQUEST) 
 
+def _get_team(team_object):
+    team = model_to_dict(team_object)
+
+    # get members from this team
+    team["members"] = [model_to_dict(member) for member in Members.objects.filter(team=team['id'])]
+
+    # get bars from this team
+    team_bars = [model_to_dict(row) for row in TeamsBars.objects.filter(teamId=team['id'])]
+    team["bars"] = [
+        {
+            "id": bar["barId"],
+            "bar": model_to_dict(Bars.objects.get(id=bar['barId'])),
+            "points": bar['points'],
+            'drinks': bar['drinks'],
+            "has_egg": bar['has_egg'],
+            "puked": bar['puked'],
+            "visited": bar['visited'],
+            "won_game": bar['won_game']
+        }
+    for bar in team_bars]
+
+    return team
+
 
 @api_view(["POST", "GET", "DELETE"])
 @csrf_exempt
@@ -179,16 +203,27 @@ def members(request, id=None):
                     try:
                         member.save()
 
+                        # create assoc member <-> bars
+                        all_bars = Bars.objects.all()
+                        for bar in all_bars:
+                            # check if the assoc already exists
+                            try:
+                                MembersBars.objects.get(barId=bar, memberId=member)
+                            except MembersBars.DoesNotExist:
+                                member_bars_assoc = MembersBars(barId=bar, memberId=member)                        
+                                member_bars_assoc.save()
+
                         return Response({
                             "status": 200,
                             "message": f"Added member {data['name']} successfully to team {team.id}"
                         }, status=status.HTTP_200_OK)
-                    except Exception:
+                    except Exception as e:
                         member.delete()
 
                         return Response({
                             "status": 500,
-                            "message": f"Could not add member {data['name']}"
+                            "message": f"Could not add member {data['name']}",
+                            "error": str(e)
                         },status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             except KeyError:
                 return Response({
@@ -239,6 +274,17 @@ def members(request, id=None):
                     member["team"] = model_to_dict(member_object.team)
                     members.append(member)
 
+                    # get bars from this member
+                    member_bars = [model_to_dict(row) for row in MembersBars.objects.filter(memberId=member['id'])]
+                    member["bars"] = [
+                        {
+                            "id": bar["barId"],
+                            "bar": model_to_dict(Bars.objects.get(id=bar['barId'])),
+                            "points": bar['points'],
+                            'drinks': bar['drinks']
+                        }
+                        for bar in member_bars]
+
                 return Response(members[0] if len(members) == 1 else members, status=status.HTTP_200_OK)
             except Teams.DoesNotExist:
                 return Response({
@@ -266,7 +312,6 @@ def members(request, id=None):
                 "status": 400,
                 "message": "Missing member identifier"
             }, status=status.HTTP_400_BAD_REQUEST) 
-            
 
 
 @api_view(["POST", "GET", "DELETE"])
@@ -300,26 +345,38 @@ def bars(request, id=None):
                                 team_bars_assoc = TeamsBars(teamId=team, barId=bar)                        
                                 team_bars_assoc.save()
 
+                        # fill MembersBars
+                        all_members = Members.objects.all()
+                        for member in all_members:
+                            # check if the assoc already exists
+                            try:
+                                MembersBars.objects.get(barId=bar, memberId=member)
+                            except MembersBars.DoesNotExist:
+                                member_bars_assoc = MembersBars(barId=bar, memberId=member)
+                                member_bars_assoc.save()
+
                         return Response({
                             "status": 200,
                             "message": f"Added bar {data['name']} successfully"
                         }, status=status.HTTP_200_OK)
-                    except Exception:
-                        bar.delete()
+                    except Exception as e:
+                        # bar.delete()
 
                         return Response({
                             "status": 500,
-                            "message": f"Could not add bar {data['name']}"
+                            "message": f"Could not add bar {data['name']}",
+                            "error": str(e)
                         },status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             except KeyError:
                 return Response({
                     "status": 400,
                     "message": "JSON Keys missing"
                 }, status=status.HTTP_400_BAD_REQUEST)
-        except ValueError:
+        except ValueError as e:
             return Response({
                 "status": 400,
-                "message": "Invalid JSON format"
+                "message": "Invalid JSON format",
+                "error": str(e) 
             }, status=status.HTTP_400_BAD_REQUEST)
 
     if request.method == "GET":

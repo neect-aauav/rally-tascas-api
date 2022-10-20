@@ -27,7 +27,7 @@ class Bars(models.Model):
 	name = models.CharField(max_length=255)
 	location = models.TextField()
 	picture = models.TextField()
-	game = models.ForeignKey(Games, on_delete=(models.CASCADE), default=None)
+	game = models.ForeignKey(Games, on_delete=(models.CASCADE), default=None, blank=True, null=True)
 
 class TeamsBars(models.Model):
 	teamId = models.ForeignKey(Teams, on_delete=models.CASCADE)
@@ -49,4 +49,4 @@ class Prizes(models.Model):
 	place = models.IntegerField()
 	name = models.CharField(max_length=255)
 	ammount = models.IntegerField()
-	winner = models.ForeignKey(Teams, on_delete=models.CASCADE, default=None)
+	winner = models.ForeignKey(Teams, on_delete=models.CASCADE, default=None, blank=True, null=True)
