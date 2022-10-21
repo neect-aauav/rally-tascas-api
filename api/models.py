@@ -22,11 +22,13 @@ class Games(models.Model):
 	name = models.CharField(max_length=255)
 	description = models.TextField(default=None)
 	points = models.IntegerField()
+	completed = models.IntegerField(default=0)
 
 class Bars(models.Model):
 	name = models.CharField(max_length=255)
 	location = models.TextField()
 	picture = models.TextField()
+	points = models.IntegerField(default=0)
 	game = models.ForeignKey(Games, on_delete=(models.CASCADE), default=None, blank=True, null=True)
 
 class TeamsBars(models.Model):

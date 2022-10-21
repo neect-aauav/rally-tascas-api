@@ -17,7 +17,7 @@ import random
 import os
 import requests
 
-@api_view(["POST", "GET", "DELETE"])
+@api_view(["POST", "GET", "DELETE", "PATCH"])
 @csrf_exempt
 def teams(request, id=None):
     if request.method == "POST":
@@ -28,7 +28,6 @@ def teams(request, id=None):
                     try:
                         Teams.objects.get(name=data["team"])
 
-                        # if already exists, break
                         return Response({
                             "status": 400,
                             "message": f"A team with the name {data['team']} already exists"
@@ -150,6 +149,50 @@ def teams(request, id=None):
                 "message": "Missing team identifier"
             }, status=status.HTTP_400_BAD_REQUEST) 
 
+    if request.method == "PATCH":
+        try:
+            data = json.loads(request.body)
+            if id is not None:
+                try:
+                    team = Teams.objects.get(id=id)
+                    modifiable_fields = ["name", "email", "points", "drinks", "has_egg", "puked"]
+                    for field in modifiable_fields:
+                        if field in data:
+                            # if field is name, check if it already exists
+                            if field == "name":
+                                try:
+                                    Teams.objects.get(name=data[field])
+                                    return Response({
+                                        "status": 400,
+                                        "message": f"A team with the name {data[field]} already exists"
+                                    }, status=status.HTTP_400_BAD_REQUEST)
+                                except Teams.DoesNotExist:
+                                    pass
+                                
+                            setattr(team, field, data[field])
+
+                    team.save()
+                    return Response({
+                        "status": 200,
+                        "message": f"Updated team {team.name}"
+                    }, status=status.HTTP_200_OK) 
+                except Teams.DoesNotExist:
+                    return Response({
+                        "status": 400,
+                        "message": f"There is no team with the id {id}"
+                    }, status=status.HTTP_400_BAD_REQUEST) 
+            else:
+                return Response({
+                    "status": 400,
+                    "message": "Missing team identifier"
+                }, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError as e:
+            return Response({
+                "status": 400,
+                "message": "Invalid JSON format",
+                "error": str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
+
 def _get_team(team_object):
     team = model_to_dict(team_object)
 
@@ -174,7 +217,7 @@ def _get_team(team_object):
     return team
 
 
-@api_view(["POST", "GET", "DELETE"])
+@api_view(["POST", "GET", "DELETE", "PATCH"])
 @csrf_exempt
 def members(request, id=None):
     if request.method == "POST":
@@ -311,10 +354,54 @@ def members(request, id=None):
             return Response({
                 "status": 400,
                 "message": "Missing member identifier"
-            }, status=status.HTTP_400_BAD_REQUEST) 
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+    if request.method == "PATCH":
+        try:
+            data = json.loads(request.body)
+            if id is not None:
+                try:
+                    member = Members.objects.get(id=id)
+                    modifiable_fields = ["name", "nmec", "course", "team", "points"]
+                    for field in modifiable_fields:
+                        if field in data:
+                            # if field is nmec, check if it already exists
+                            if field == "nmec":
+                                try:
+                                    Members.objects.get(nmec=data[field])
+                                    return Response({
+                                        "status": 400,
+                                        "message": f"A member with the nmec {data[field]} already exists"
+                                    }, status=status.HTTP_400_BAD_REQUEST)
+                                except Members.DoesNotExist:
+                                    pass
+                                
+                            setattr(member, field, data[field])
+
+                    member.save()
+                    return Response({
+                        "status": 200,
+                        "message": f"Updated member {member.name} with nmec {member.nmec}"
+                    }, status=status.HTTP_200_OK) 
+                except Teams.DoesNotExist:
+                    return Response({
+                        "status": 400,
+                        "message": f"There is no member with the id {id}"
+                    }, status=status.HTTP_400_BAD_REQUEST) 
+            else:
+                return Response({
+                    "status": 400,
+                    "message": "Missing member identifier"
+                }, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError as e:
+            return Response({
+                "status": 400,
+                "message": "Invalid JSON format",
+                "error": str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(["POST", "GET", "DELETE"])
+@api_view(["POST", "GET", "DELETE", "PATCH"])
 @csrf_exempt
 def bars(request, id=None):
     if request.method == "POST":
@@ -330,7 +417,11 @@ def bars(request, id=None):
                         "message": f"A bar with the name {data['name']} already exists"
                     }, status=status.HTTP_400_BAD_REQUEST)
                 except Bars.DoesNotExist:
-                    bar = Bars(name=data['name'], location=data['location'], picture=data['picture'])
+                    if "game" in data:
+                        game = Games.objects.get(id=data["game"])
+                        bar = Bars(name=data['name'], location=data['location'], picture=data['picture'], game=game)
+                    else:
+                        bar = Bars(name=data['name'], location=data['location'], picture=data['picture'])
 
                     try:
                         bar.save()
@@ -385,6 +476,9 @@ def bars(request, id=None):
                 bar_object = Bars.objects.get(id=id)
                 bar = model_to_dict(bar_object)
 
+                if bar_object.game is not None:
+                    bar["game"] = model_to_dict(Games.objects.get(id=bar["game"]))
+
                 return Response(bar, status=status.HTTP_200_OK) 
             except Bars.DoesNotExist:
                 return Response({
@@ -405,6 +499,9 @@ def bars(request, id=None):
                 bars = []
                 for bar_object in bar_objects:
                     bar = model_to_dict(bar_object)
+                    if bar_object.game is not None:
+                        bar["game"] = model_to_dict(Games.objects.get(id=bar["game"]))
+                    
                     bars.append(bar)
 
                 return Response(bars[0] if len(bars) == 1 else bars, status=status.HTTP_200_OK)
@@ -435,6 +532,61 @@ def bars(request, id=None):
                 "message": "Missing bar identifier"
             }, status=status.HTTP_400_BAD_REQUEST) 
 
+    if request.method == "PATCH":
+        try:
+            data = json.loads(request.body)
+            if id is not None:
+                try:
+                    bar = Bars.objects.get(id=id)
+                    modifiable_fields = ["name", "location", "picture", "game"]
+                    for field in modifiable_fields:
+                        if field in data:
+                            # if field is name, check if it already exists
+                            if field == "name":
+                                try:
+                                    Bars.objects.get(name=data[field])
+                                    return Response({
+                                        "status": 400,
+                                        "message": f"A bar with the name {data[field]} already exists"
+                                    }, status=status.HTTP_400_BAD_REQUEST)
+                                except Members.DoesNotExist:
+                                    pass
+
+                            # if field is game, check if it exists
+                            if field == "game":
+                                try:
+                                    game = Games.objects.get(id=data[field])
+                                    setattr(bar, field, game)
+                                    continue
+                                except Games.DoesNotExist:
+                                    return Response({
+                                        "status": 400,
+                                        "message": f"There is no game with the id {data[field]}"
+                                    }, status=status.HTTP_400_BAD_REQUEST)
+                                
+                            setattr(bar, field, data[field])
+
+                    bar.save()
+                    return Response({
+                        "status": 200,
+                        "message": f"Updated bar {bar.name}"
+                    }, status=status.HTTP_200_OK) 
+                except Teams.DoesNotExist:
+                    return Response({
+                        "status": 400,
+                        "message": f"There is no bar with the id {id}"
+                    }, status=status.HTTP_400_BAD_REQUEST) 
+            else:
+                return Response({
+                    "status": 400,
+                    "message": "Missing bar identifier"
+                }, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError as e:
+            return Response({
+                "status": 400,
+                "message": "Invalid JSON format",
+                "error": str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["POST", "GET"])
 @csrf_exempt
@@ -686,7 +838,51 @@ def games(request, id=None):
             return Response({
                 "status": 400,
                 "message": "Missing game identifier"
-            }, status=status.HTTP_400_BAD_REQUEST) 
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+    if request.method == "PATCH":
+        try:
+            data = json.loads(request.body)
+            if id is not None:
+                try:
+                    game = Games.objects.get(id=id)
+                    modifiable_fields = ["name", "location", "points"]
+                    for field in modifiable_fields:
+                        if field in data:
+                            # if field is name, check if it already exists
+                            if field == "name":
+                                try:
+                                    Games.objects.get(name=data[field])
+                                    return Response({
+                                        "status": 400,
+                                        "message": f"A game with the name {data[field]} already exists"
+                                    }, status=status.HTTP_400_BAD_REQUEST)
+                                except Games.DoesNotExist:
+                                    pass
+                                
+                            setattr(game, field, data[field])
+
+                    game.save()
+                    return Response({
+                        "status": 200,
+                        "message": f"Updated game {game.name}"
+                    }, status=status.HTTP_200_OK) 
+                except Teams.DoesNotExist:
+                    return Response({
+                        "status": 400,
+                        "message": f"There is no game with the id {id}"
+                    }, status=status.HTTP_400_BAD_REQUEST) 
+            else:
+                return Response({
+                    "status": 400,
+                    "message": "Missing game identifier"
+                }, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError as e:
+            return Response({
+                "status": 400,
+                "message": "Invalid JSON format",
+                "error": str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["POST", "GET", "DELETE"])
@@ -790,6 +986,49 @@ def prizes(request, id=None):
                 "message": "Missing prize identifier"
             }, status=status.HTTP_400_BAD_REQUEST) 
 
+    if request.method == "PATCH":
+        try:
+            data = json.loads(request.body)
+            if id is not None:
+                try:
+                    prize = Prizes.objects.get(id=id)
+                    modifiable_fields = ["name", "place", "ammount"]
+                    for field in modifiable_fields:
+                        if field in data:
+                            # if field is place, check if it is already taken
+                            if field == "place":
+                                try:
+                                    Prizes.objects.get(place=data[field])
+                                    return Response({
+                                        "status": 400,
+                                        "message": f"A prize for the place {data[field]} already exists"
+                                    }, status=status.HTTP_400_BAD_REQUEST)
+                                except Prizes.DoesNotExist:
+                                    pass
+                                
+                            setattr(prize, field, data[field])
+
+                    prize.save()
+                    return Response({
+                        "status": 200,
+                        "message": f"Updated prize {prize.name}"
+                    }, status=status.HTTP_200_OK) 
+                except Teams.DoesNotExist:
+                    return Response({
+                        "status": 400,
+                        "message": f"There is no prize with the id {id}"
+                    }, status=status.HTTP_400_BAD_REQUEST) 
+            else:
+                return Response({
+                    "status": 400,
+                    "message": "Missing prize identifier"
+                }, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError as e:
+            return Response({
+                "status": 400,
+                "message": "Invalid JSON format",
+                "error": str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 def _handle_points(data, members, method):
         if "members" in data:
