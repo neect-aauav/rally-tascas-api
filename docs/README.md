@@ -147,7 +147,7 @@ Add a new team to the database.
 
 Get teams from the database.  
 If no team ID is specified, all teams are returned.  
-URL parameters can be used to get teams by other fields.
+URL parameters can be used to get teams by other fields.  
 Accepted URL parameters are: **name**, **email**, **id**.
 
 **HTTP Request**
@@ -260,8 +260,8 @@ Add a new member to the database.
 ### Get Member
 
 Get members from the database. 
-If no member ID is specified, all members are returned.
-URL parameters can be used to get teams by other fields.
+If no member ID is specified, all members are returned.  
+URL parameters can be used to get teams by other fields.  
 Accepted URL parameters are: **name**, **nmec**, **id**, **course**.
 
 **HTTP Request**
@@ -369,8 +369,8 @@ Add a new bar to the database.
 ### Get Bar
 
 Get bars from the database.  
-If no bar ID is specified, all bars are returned.
-URL parameters can be used to get teams by other fields.
+If no bar ID is specified, all bars are returned.  
+URL parameters can be used to get teams by other fields.  
 Accepted URL parameters are: **name**, **id**.
 
 **HTTP Request**
@@ -394,9 +394,9 @@ Must specify the bar ID.
 
 ### Update Bar
 
-Update a bar's information.
-Provide the bar ID and the fields to be updated.
-Unspecified fields will be left unchanged.
+Update a bar's information.  
+Provide the bar ID and the fields to be updated.  
+Unspecified fields will be left unchanged.  
 Updatable fields are: ***name, address, latitude, longitude, picture, points, drinks, puked, visited, game***
 
 **HTTP Request**
@@ -405,7 +405,7 @@ Updatable fields are: ***name, address, latitude, longitude, picture, points, dr
 
 ## Games
 
-Games that are played in each bar
+Games that are played in each bar.
 
 ***[POST, GET, DELETE, PATCH]***
 
@@ -458,8 +458,8 @@ Add a new game to the database.
 ### Get Game
 
 Get games from the database.  
-If no game ID is specified, all games are returned.
-URL parameters can be used to get teams by other fields.
+If no game ID is specified, all games are returned.  
+URL parameters can be used to get teams by other fields.  
 Accepted URL parameters are: **name**, **id**, **points**.
 
 **HTTP Request**
@@ -483,9 +483,9 @@ Must specify the game ID.
 
 ### Update Game
 
-Update a game's information.
-Provide the game ID and the fields to be updated.
-Unspecified fields will be left unchanged.
+Update a game's information.  
+Provide the game ID and the fields to be updated.  
+Unspecified fields will be left unchanged.  
 Updatable fields are: ***name, description, points, completed***
 
 **HTTP Request**
@@ -549,8 +549,8 @@ Add a new prize to the database.
 ### Get Prize
 
 Get prizes from the database.  
-If no prize ID is specified, all prizes are returned.
-URL parameters can be used to get teams by other fields.
+If no prize ID is specified, all prizes are returned.  
+URL parameters can be used to get teams by other fields.  
 Accepted URL parameters are: **name**, **id**, **place**, **ammount**.
 
 **HTTP Request**
@@ -574,9 +574,9 @@ Must specify the prize ID.
 
 ### Update Prize
 
-Update a prize's information.
-Provide the prize ID and the fields to be updated.
-Unspecified fields will be left unchanged.
+Update a prize's information.  
+Provide the prize ID and the fields to be updated.  
+Unspecified fields will be left unchanged.  
 Updatable fields are: ***name, place, ammount, winner***
 
 **HTTP Request**
@@ -593,7 +593,7 @@ Only authorized accounts can scan the QR code successfully.
 
 ### Generate QR Code
 
-Generate a QR code for a team.
+Generate a QR code for a team.  
 This is only used when, for some reason, the qr code image is lost or deleted.
 
 **HTTP Request**
@@ -602,7 +602,7 @@ This is only used when, for some reason, the qr code image is lost or deleted.
 
 ### Get QR Code
 
-Get the url for a QR code image from the database.
+Get the url for a QR code image from the database.  
 Must specify the team ID.
 
 **HTTP Request**
@@ -624,7 +624,7 @@ Must specify the team ID.
 
 ### Delete QR Code
 
-Delete a QR code from the database.
+Delete a QR code from the database.  
 Must specify the team ID.
 
 **HTTP Request**
@@ -633,7 +633,7 @@ Must specify the team ID.
 
 ## Create Admin Account
 
-Create an admin account to manage teams, members, bars, games and prizes.
+Create an admin account to manage teams, members, bars, games and prizes.  
 Must be superuser to use.
 
 **HTTP Request**
