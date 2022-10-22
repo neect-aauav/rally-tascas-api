@@ -16,6 +16,7 @@ class Members(models.Model):
 	course = models.CharField(max_length=255)
 	nmec = models.IntegerField()
 	points = models.IntegerField(default=0)
+	drinks = models.IntegerField(default=0)
 	team = models.ForeignKey(Teams, on_delete=models.CASCADE)
 
 class Games(models.Model):
@@ -26,9 +27,14 @@ class Games(models.Model):
 
 class Bars(models.Model):
 	name = models.CharField(max_length=255)
-	location = models.TextField()
-	picture = models.TextField()
+	address = models.CharField(max_length=255)
+	latitude = models.FloatField()
+	longitude = models.FloatField()
+	picture = models.TextField(default=None)
 	points = models.IntegerField(default=0)
+	drinks = models.IntegerField(default=0)
+	puked = models.IntegerField(default=0)
+	visited = models.IntegerField(default=0)
 	game = models.ForeignKey(Games, on_delete=(models.CASCADE), default=None, blank=True, null=True)
 
 class TeamsBars(models.Model):

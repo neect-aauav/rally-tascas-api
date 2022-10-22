@@ -56,7 +56,7 @@ def teams(request, id=None):
                             # qr code generation
                             qr_name = f'qrcodes/qr_team{team.id}.png'
                             path = f'{BASE_DIR}/static/{qr_name}'
-                            team.qr_code = f'http://{request.get_host()}/{qr_name}'
+                            team.qr_code = f'http://{request.get_host()}/static/{qr_name}'
 
                             _generate_qrcode(path, 'http://127.0.0.1:8000/api/docs/')
 
@@ -282,11 +282,7 @@ def members(request, id=None):
     if request.method == "GET":
         if id is not None:
             try:
-                member_object = Members.objects.get(id=id)
-                member = model_to_dict(member_object)
-
-                # get team from this member
-                member["team"] = model_to_dict(member_object.team)
+                member = _get_member(Members.objects.get(id=id))
 
                 return Response(member, status=status.HTTP_200_OK) 
             except Teams.DoesNotExist:
@@ -311,22 +307,7 @@ def members(request, id=None):
 
                 members = []
                 for member_object in member_objects:
-                    member = model_to_dict(member_object)
-
-                    # get team from this member
-                    member["team"] = model_to_dict(member_object.team)
-                    members.append(member)
-
-                    # get bars from this member
-                    member_bars = [model_to_dict(row) for row in MembersBars.objects.filter(memberId=member['id'])]
-                    member["bars"] = [
-                        {
-                            "id": bar["barId"],
-                            "bar": model_to_dict(Bars.objects.get(id=bar['barId'])),
-                            "points": bar['points'],
-                            'drinks': bar['drinks']
-                        }
-                        for bar in member_bars]
+                    members.append(_get_member(member_object))
 
                 return Response(members[0] if len(members) == 1 else members, status=status.HTTP_200_OK)
             except Teams.DoesNotExist:
@@ -401,6 +382,26 @@ def members(request, id=None):
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
+def _get_member(member_object):
+    member = model_to_dict(member_object)
+
+    # get team from this member
+    member["team"] = model_to_dict(member_object.team)
+
+    # get bars from this member
+    member_bars = [model_to_dict(row) for row in MembersBars.objects.filter(memberId=member['id'])]
+    member["bars"] = [
+        {
+            "id": bar["barId"],
+            "bar": model_to_dict(Bars.objects.get(id=bar['barId'])),
+            "points": bar['points'],
+            'drinks': bar['drinks']
+        }
+        for bar in member_bars]
+
+    return member
+
+
 @api_view(["POST", "GET", "DELETE", "PATCH"])
 @csrf_exempt
 def bars(request, id=None):
@@ -419,9 +420,9 @@ def bars(request, id=None):
                 except Bars.DoesNotExist:
                     if "game" in data:
                         game = Games.objects.get(id=data["game"])
-                        bar = Bars(name=data['name'], location=data['location'], picture=data['picture'], game=game)
+                        bar = Bars(name=data['name'], address=data['address'], latitude=data['latitude'], longitude=data['longitude'], picture=data['picture'], game=game)
                     else:
-                        bar = Bars(name=data['name'], location=data['location'], picture=data['picture'])
+                        bar = Bars(name=data['name'], address=data['address'], latitude=data['latitude'], longitude=data['longitude'], picture=data['picture'])
 
                     try:
                         bar.save()
@@ -477,7 +478,7 @@ def bars(request, id=None):
                 bar = model_to_dict(bar_object)
 
                 if bar_object.game is not None:
-                    bar["game"] = model_to_dict(Games.objects.get(id=bar["game"]))
+                    bar["game"] = model_to_dict(bar_object.game)
 
                 return Response(bar, status=status.HTTP_200_OK) 
             except Bars.DoesNotExist:
@@ -500,7 +501,7 @@ def bars(request, id=None):
                 for bar_object in bar_objects:
                     bar = model_to_dict(bar_object)
                     if bar_object.game is not None:
-                        bar["game"] = model_to_dict(Games.objects.get(id=bar["game"]))
+                        bar["game"] = model_to_dict(bar_object.game)
                     
                     bars.append(bar)
 
@@ -538,7 +539,7 @@ def bars(request, id=None):
             if id is not None:
                 try:
                     bar = Bars.objects.get(id=id)
-                    modifiable_fields = ["name", "location", "picture", "game"]
+                    modifiable_fields = ["name", "address", "latitude", "longitude", "picture", "points", "drinks", "puked", "visited", "game"]
                     for field in modifiable_fields:
                         if field in data:
                             # if field is name, check if it already exists
@@ -709,8 +710,11 @@ def qrcodes(request, id=None):
             if request.method == "POST":
                 qr_name = f'qrcodes/qr_team{id}.png'
                 path = f'{BASE_DIR}/static/{qr_name}'
+                team.qr_code = f'http://{request.get_host()}/static/{qr_name}'
 
                 _generate_qrcode(path, 'http://127.0.0.1:8000/api/docs/')
+
+                team.save()
 
                 return Response({
                     "status": 200,
@@ -741,7 +745,7 @@ def qrcodes(request, id=None):
         }, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(["POST", "GET", "DELETE"])
+@api_view(["POST", "GET", "DELETE", "PATCH"])
 @csrf_exempt
 def games(request, id=None):
     if request.method == "POST":
@@ -885,7 +889,7 @@ def games(request, id=None):
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(["POST", "GET", "DELETE"])
+@api_view(["POST", "GET", "DELETE", "PATCH"])
 @csrf_exempt
 def prizes(request, id=None):
     if request.method == "POST":
@@ -931,8 +935,12 @@ def prizes(request, id=None):
     if request.method == "GET":
         if id is not None:
             try:
-                prize_object = Games.objects.get(id=id)
+                prize_object = Prizes.objects.get(id=id)
                 prize = model_to_dict(prize_object)
+
+                # get winner if exists
+                if prize_object.winner is not None:
+                    prize["winner"] = model_to_dict(prize_object.winner)
 
                 return Response(prize, status=status.HTTP_200_OK) 
             except Prizes.DoesNotExist:
@@ -956,6 +964,11 @@ def prizes(request, id=None):
                 prizes = []
                 for prize_object in prize_objects:
                     prize = model_to_dict(prize_object)
+                    
+                    # get winner if exists
+                    if prize_object.winner is not None:
+                        prize["winner"] = model_to_dict(prize_object.winner)
+                    
                     prizes.append(prize)
 
                 return Response(prizes[0] if len(prizes) == 1 else prizes, status=status.HTTP_200_OK)
@@ -992,7 +1005,7 @@ def prizes(request, id=None):
             if id is not None:
                 try:
                     prize = Prizes.objects.get(id=id)
-                    modifiable_fields = ["name", "place", "ammount"]
+                    modifiable_fields = ["name", "place", "ammount", "winner"]
                     for field in modifiable_fields:
                         if field in data:
                             # if field is place, check if it is already taken
@@ -1005,6 +1018,18 @@ def prizes(request, id=None):
                                     }, status=status.HTTP_400_BAD_REQUEST)
                                 except Prizes.DoesNotExist:
                                     pass
+
+                            # if field is winner, make sure the team exists
+                            if field == "winner":
+                                try:
+                                    team = Teams.objects.get(id=data[field])
+                                    setattr(prize, field, team)
+                                    continue
+                                except Teams.DoesNotExist:
+                                    return Response({
+                                        "status": 400,
+                                        "message": f"There is no team with the id {data[field]}"
+                                    }, status=status.HTTP_400_BAD_REQUEST)
                                 
                             setattr(prize, field, data[field])
 
