@@ -34,4 +34,7 @@ $ sudo fuser -n tcp -k 8000
 
 ## API Docs
 Swagger documentation for the API:  
-[http://127.0.0.1:8000/api/docs](http://127.0.0.1:8000/api/docs)
+[http://127.0.0.1:8000/api/docs](http://127.0.0.1:8000/api/docs) *(to be improved)*
+
+Markdown documentation for the API:
+[docs/README.md](docs/README.md)

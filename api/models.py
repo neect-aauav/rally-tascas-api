@@ -39,7 +39,7 @@ class TeamsBars(models.Model):
 	drinks = models.IntegerField(default=0)
 	won_game = models.BooleanField(default=False)
 	has_egg = models.BooleanField(default=True)
-	puked = models.BooleanField(default=False)
+	puked = models.IntegerField(default=0) 
 
 class MembersBars(models.Model):
 	memberId = models.ForeignKey(Members, on_delete=models.CASCADE)
