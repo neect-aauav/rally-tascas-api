@@ -807,6 +807,8 @@ def games(request, id=None):
                     game_objects= [Games.objects.get(name=request.GET.get("name"))]
                 elif request.GET.get("id"):
                     game_objects = [Games.objects.get(id=request.GET.get("id"))]
+                elif request.GET.get("points"):
+                    game_objects = Games.objects.filter(points=request.GET.get("points"))
                 else:
                     # return all teams
                     game_objects = Games.objects.all()
@@ -957,6 +959,8 @@ def prizes(request, id=None):
                     prize_objects = [Prizes.objects.get(id=request.GET.get("id"))]
                 elif request.GET.get("place"):
                     prize_objects = [Prizes.objects.get(place=request.GET.get("place"))]
+                elif request.GET.get("ammount"):
+                    prize_objects = Prizes.objects.filter(ammount=request.GET.get("ammount"))
                 else:
                     # return all teams
                     prize_objects = Prizes.objects.all()

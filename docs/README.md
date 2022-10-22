@@ -146,12 +146,15 @@ Add a new team to the database.
 ### Get Team
 
 Get teams from the database.  
-If no team ID is specified, all teams are returned. 
+If no team ID is specified, all teams are returned.  
+URL parameters can be used to get teams by other fields.
+Accepted URL parameters are: **name**, **email**, **id**.
 
 **HTTP Request**
 
 ``` GET .../api/teams```  
-``` GET .../api/teams/{team_id}```
+``` GET .../api/teams/{team_id}```  
+``` GET .../api/teams?name={team_name}```
 
 **Response Body**
 
@@ -258,11 +261,14 @@ Add a new member to the database.
 
 Get members from the database. 
 If no member ID is specified, all members are returned.
+URL parameters can be used to get teams by other fields.
+Accepted URL parameters are: **name**, **nmec**, **id**, **course**.
 
 **HTTP Request**
 
 ``` GET .../api/members```  
-``` GET .../api/members/{member_id}```
+``` GET .../api/members/{member_id}```  
+``` GET .../api/members?name={member_name}```
 
 **Response Body**
 
@@ -364,11 +370,14 @@ Add a new bar to the database.
 
 Get bars from the database.  
 If no bar ID is specified, all bars are returned.
+URL parameters can be used to get teams by other fields.
+Accepted URL parameters are: **name**, **id**.
 
 **HTTP Request**
 
 ``` GET .../api/bars```  
-``` GET .../api/bars/{bar_id}```
+``` GET .../api/bars/{bar_id}```  
+``` GET .../api/bars?name={bar_name}```
 
 **Response Body**
 
@@ -450,11 +459,14 @@ Add a new game to the database.
 
 Get games from the database.  
 If no game ID is specified, all games are returned.
+URL parameters can be used to get teams by other fields.
+Accepted URL parameters are: **name**, **id**, **points**.
 
 **HTTP Request**
 
 ``` GET .../api/games```  
-``` GET .../api/games/{game_id}```
+``` GET .../api/games/{game_id}```  
+``` GET .../api/games?name={game_name}```
 
 **Response Body**
 
@@ -538,11 +550,14 @@ Add a new prize to the database.
 
 Get prizes from the database.  
 If no prize ID is specified, all prizes are returned.
+URL parameters can be used to get teams by other fields.
+Accepted URL parameters are: **name**, **id**, **place**, **ammount**.
 
 **HTTP Request**
 
 ``` GET .../api/prizes```  
-``` GET .../api/prizes/{prize_id}```
+``` GET .../api/prizes/{prize_id}```  
+``` GET .../api/prizes?name={prize_name}```
 
 **Response Body**
 
