@@ -150,7 +150,7 @@ If no team ID is specified, all teams are returned.
 
 **HTTP Request**
 
-``` GET .../api/teams```
+``` GET .../api/teams```  
 ``` GET .../api/teams/{team_id}```
 
 **Response Body**
@@ -261,7 +261,7 @@ If no member ID is specified, all members are returned.
 
 **HTTP Request**
 
-``` GET .../api/members```
+``` GET .../api/members```  
 ``` GET .../api/members/{member_id}```
 
 **Response Body**
@@ -367,7 +367,7 @@ If no bar ID is specified, all bars are returned.
 
 **HTTP Request**
 
-``` GET .../api/bars```
+``` GET .../api/bars```  
 ``` GET .../api/bars/{bar_id}```
 
 **Response Body**
@@ -453,7 +453,7 @@ If no game ID is specified, all games are returned.
 
 **HTTP Request**
 
-``` GET .../api/games```
+``` GET .../api/games```  
 ``` GET .../api/games/{game_id}```
 
 **Response Body**
@@ -541,7 +541,7 @@ If no prize ID is specified, all prizes are returned.
 
 **HTTP Request**
 
-``` GET .../api/prizes```
+``` GET .../api/prizes```  
 ``` GET .../api/prizes/{prize_id}```
 
 **Response Body**
