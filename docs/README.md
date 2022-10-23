@@ -1,9 +1,16 @@
 # NEECT RALLY-TASCAS API
-API that handles data to and from neect rally-tascas' databases
+API that handles data to and from neect rally-tascas' databases.
+
+🔑 This application uses **API Token Authorization** to access some endpoints (usually, read only HTTP request methods don't require the Token).
 
 ## API Documentation
 
-### Rally Tascas
+### Introduction
+
+1. [Make a HTTP Request](#make-a-http-request)
+1. [Symbol Keys](#symbol-keys)
+
+### Base Structures and Endpoints
 
 1. [Teams](#teams)
     1. [Structure](#teams-structure)
@@ -45,6 +52,41 @@ API that handles data to and from neect rally-tascas' databases
 1. [Admin](#admin)
     1. [Create Admin Account](#create-admin-account)
     1. [Get Admin Token](#get-admin-token)
+
+---
+
+## Make a HTTP Request
+
+Every endpoint is accessed through a HTTP Request. The request method is specified in the endpoint's documentation.  
+If the request method is `GET`, there is no need for any special authorization and no body is required.  
+If the request method is `POST`, `PUT` or `DELETE`, the request body must be a JSON object and the request must be authorized with an API Token, passed in the Header as follows:
+
+```shell
+GET /schedule
+  -H 'accept: application/json'
+  -H 'Authorization: Token {token}'
+```
+This token can be obtained by creating an admin account and getting the token from the `/api/token` endpoint. See [Get Admin Token](#get-admin-token).
+
+The Responses to any Request is always a JSON. Generaly, upon a successful `GET` request, the response will contain the requested object(s). Otherwise, the response will contain a message with either confirmation of the action or an error, as follows:
+
+```json5
+{
+    "status": 400,
+    "message": "A team with the name Test already exists"
+}
+```
+
+---
+
+## Symbol Keys
+
+The following symbols are used in the documentation:
+
+**🦸:** Requires Superuser Authorization
+**🔑:** Requires API Token Authorization
+
+---
 
 ## Teams
 
@@ -118,7 +160,7 @@ Add a new team to the database.
 
 **HTTP Request**
 
-``` POST .../api/teams```
+``` POST .../api/teams```  [🔑](#make-a-http-request)
 
 **Request Body**
 ```json5
@@ -167,7 +209,7 @@ Must specify the team ID.
 
 **HTTP Request**
 
-``` DELETE .../api/teams/{team_id}```
+``` DELETE .../api/teams/{team_id}``` [🔑](#make-a-http-request)
 
 ### Update Team
 
@@ -178,7 +220,9 @@ Updatable fields are: ***name, email, points, drinks, has_egg, puked***
 
 **HTTP Request**
 
-``` PATCH .../api/teams/{team_id}```
+``` PATCH .../api/teams/{team_id}``` [🔑](#make-a-http-request)
+
+---
 
 ## Members
 
@@ -237,7 +281,7 @@ Add a new member to the database.
 
 **HTTP Request**
 
-``` POST .../api/members```
+``` POST .../api/members``` [🔑](#make-a-http-request)
 
 **Request Body**
 ```json5
@@ -281,7 +325,7 @@ Must specify the member ID.
 
 **HTTP Request**
 
-``` DELETE .../api/members/{member_id}```
+``` DELETE .../api/members/{member_id}``` [🔑](#make-a-http-request)
 
 ### Update Member
 
@@ -292,7 +336,9 @@ Updatable fields are: ***name, nmec, course, team, points, drinks***
 
 **HTTP Request**
 
-``` PATCH .../api/members/{member_id}```
+``` PATCH .../api/members/{member_id}``` [🔑](#make-a-http-request)
+
+---
 
 ## Bars
 
@@ -342,7 +388,7 @@ Add a new bar to the database.
 
 **HTTP Request**
 
-``` POST .../api/bars```
+``` POST .../api/bars``` [🔑](#make-a-http-request)
 
 **Request Body**
 ```json5
@@ -390,7 +436,7 @@ Must specify the bar ID.
 
 **HTTP Request**
 
-``` DELETE .../api/bars/{bar_id}```
+``` DELETE .../api/bars/{bar_id}``` [🔑](#make-a-http-request)
 
 ### Update Bar
 
@@ -401,7 +447,9 @@ Updatable fields are: ***name, address, latitude, longitude, picture, points, dr
 
 **HTTP Request**
 
-``` PATCH .../api/bars/{bar_id}```
+``` PATCH .../api/bars/{bar_id}``` [🔑](#make-a-http-request)
+
+---
 
 ## Games
 
@@ -437,7 +485,7 @@ Add a new game to the database.
 
 **HTTP Request**
 
-``` POST .../api/games```
+``` POST .../api/games``` [🔑](#make-a-http-request)
 
 **Request Body**
 ```json5
@@ -479,7 +527,7 @@ Must specify the game ID.
 
 **HTTP Request**
 
-``` DELETE .../api/games/{game_id}```
+``` DELETE .../api/games/{game_id}``` [🔑](#make-a-http-request)
 
 ### Update Game
 
@@ -490,7 +538,9 @@ Updatable fields are: ***name, description, points, completed***
 
 **HTTP Request**
 
-``` PATCH .../api/games/{game_id}```
+``` PATCH .../api/games/{game_id}``` [🔑](#make-a-http-request)
+
+---
 
 ## Prizes
 
@@ -527,7 +577,7 @@ Add a new prize to the database.
 
 **HTTP Request**
 
-``` POST .../api/prizes```
+``` POST .../api/prizes``` [🔑](#make-a-http-request)
 
 **Request Body**
 ```json5
@@ -570,7 +620,7 @@ Must specify the prize ID.
 
 **HTTP Request**
 
-``` DELETE .../api/prizes/{prize_id}```
+``` DELETE .../api/prizes/{prize_id}``` [🔑](#make-a-http-request)
 
 ### Update Prize
 
@@ -581,7 +631,9 @@ Updatable fields are: ***name, place, ammount, winner***
 
 **HTTP Request**
 
-``` PATCH .../api/prizes/{prize_id}```
+``` PATCH .../api/prizes/{prize_id}``` [🔑](#make-a-http-request)
+
+---
 
 ## QR Codes
 
@@ -598,7 +650,7 @@ This is only used when, for some reason, the qr code image is lost or deleted.
 
 **HTTP Request**
 
-``` POST .../api/qrcodes/{team_id}```
+``` POST .../api/qrcodes/{team_id}``` [🔑](#make-a-http-request)
 
 ### Get QR Code
 
@@ -629,7 +681,9 @@ Must specify the team ID.
 
 **HTTP Request**
 
-``` DELETE .../api/qrcodes/{team_id}```
+``` DELETE .../api/qrcodes/{team_id}``` [🔑](#make-a-http-request)
+
+---
 
 ## Create Admin Account
 
@@ -638,11 +692,13 @@ Must be superuser to use.
 
 **HTTP Request**
 
-``` POST .../api/register```
+``` POST .../api/register``` 🦸[🔑](#make-a-http-request)
 
 **Request Body**
 ```json5
 {
+    "name": "Admin",
+    "nmec": 12345,
     "username": "admin",
     "password": "admin"
 }
@@ -651,8 +707,12 @@ Must be superuser to use.
 #### **Fields**
 | ID | Mandatory | Data Type |
 |----|:---------:|-----------|
+| **name** | ✔ | string |
+| **nmec** | ✔ | integer |
 | **username** | ✔ | string |
 | **password** | ✔ | string |
+
+---
 
 ## Get Admin Token
 

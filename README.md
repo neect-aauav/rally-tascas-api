@@ -1,6 +1,7 @@
-# neect-rally-tascas
+# rally-tascas-api
 
-Rally Tascas Web App made by **NEECT - Núcleo de Estudantes de Engenharia de Computadores e Telemática**
+Rally Tascas API made by **NEECT - Núcleo de Estudantes de Engenharia de Computadores e Telemática**  
+This application was created using **Python** and **Django**.
 
 ## Setup
 - Setup MySQL database

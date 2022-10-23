@@ -1,7 +1,8 @@
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from api.models import MembersBars, Teams, Members, Bars, TeamsBars, Games, Prizes
 from django.forms.models import model_to_dict
@@ -17,7 +18,8 @@ import random
 import os
 import requests
 
-@api_view(["POST", "GET", "DELETE", "PATCH"])
+@api_view(["GET", "POST", "DELETE", "PATCH"])
+@permission_classes((IsAuthenticatedOrReadOnly,))
 @csrf_exempt
 def teams(request, id=None):
     if request.method == "POST":
@@ -218,6 +220,7 @@ def _get_team(team_object):
 
 
 @api_view(["POST", "GET", "DELETE", "PATCH"])
+@permission_classes((IsAuthenticatedOrReadOnly,))
 @csrf_exempt
 def members(request, id=None):
     if request.method == "POST":
@@ -403,6 +406,7 @@ def _get_member(member_object):
 
 
 @api_view(["POST", "GET", "DELETE", "PATCH"])
+@permission_classes((IsAuthenticatedOrReadOnly,))
 @csrf_exempt
 def bars(request, id=None):
     if request.method == "POST":
@@ -700,6 +704,7 @@ def points(request, id=None, method=None):
 
 
 @api_view(["POST", "GET", "DELETE"])
+@permission_classes((IsAuthenticatedOrReadOnly,))
 @csrf_exempt
 def qrcodes(request, id=None):
     if id is not None:
@@ -746,6 +751,7 @@ def qrcodes(request, id=None):
 
 
 @api_view(["POST", "GET", "DELETE", "PATCH"])
+@permission_classes((IsAuthenticatedOrReadOnly,))
 @csrf_exempt
 def games(request, id=None):
     if request.method == "POST":
@@ -892,6 +898,7 @@ def games(request, id=None):
 
 
 @api_view(["POST", "GET", "DELETE", "PATCH"])
+@permission_classes((IsAuthenticatedOrReadOnly,))
 @csrf_exempt
 def prizes(request, id=None):
     if request.method == "POST":
