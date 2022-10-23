@@ -12,6 +12,7 @@ from qrcode.image.styledpil import StyledPilImage
 from qrcode.image.styles.colormasks import *
 
 from neectrally.settings import BASE_DIR
+from management import logger
 
 import json
 import qrcode
@@ -31,10 +32,12 @@ def teams(request, id=None):
                     try:
                         Teams.objects.get(name=data["team"])
 
-                        return Response({
-                            "status": 400,
+                        response = {
+                            "status": status.HTTP_400_BAD_REQUEST,
                             "message": f"A team with the name {data['team']} already exists"
-                        }, status=status.HTTP_400_BAD_REQUEST)
+                        }
+                        logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                        return Response(response, status=response["status"])
                     except Teams.DoesNotExist:
                         try:
                             team = Teams(name=data['team'], email=data['email'])
@@ -65,46 +68,59 @@ def teams(request, id=None):
 
                             team.save()
                             
-                            return Response({
-                                "status": 200,
+                            response = {
+                                "status": status.HTTP_200_OK,
                                 "message": f"Added team {data['team']} successfully"
-                            }, status=status.HTTP_200_OK)
+                            }
+                            logger.info(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                            return Response(response, status=response["status"])
                         except Exception as e:
                             team.delete()
 
-                            return Response({
-                                "status": 500,
-                                "message": f"Could not add team {data['team']}",
-                                "error": str(e)
-                            },status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                            response = {
+                                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                "message": f"Could not add team {data['team']}"
+                            }
+                            logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                            return Response(response, status=response["status"])
                 else:
-                    return Response({
-                        "status": 400,
-                        "message": "Number of members can't be 0"
-                    }, status=status.HTTP_400_BAD_REQUEST)
-            except KeyError:
-                return Response({
-                    "status": 400,
+                    response = {
+                        "status": status.HTTP_400_BAD_REQUEST,
+                        "message": "A team must have at least one member"
+                    }
+                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                    return Response(response, status=response["status"])
+            except KeyError as e:
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
                     "message": "JSON Keys missing"
-                }, status=status.HTTP_400_BAD_REQUEST)
+                }
+                logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                return Response(response, status=response["status"])
         except ValueError as e:
-            return Response({
-                "status": 400,
-                "message": "Invalid JSON format",
-                "error": str(e)
-            }, status=status.HTTP_400_BAD_REQUEST)
+            response = {
+                "status": status.HTTP_400_BAD_REQUEST,
+                "message": "Invalid JSON format"
+            }
+            logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+            return Response(response, status=response["status"])
     
     if request.method == "GET":
         if id is not None:
             try:
                 team = _get_team(Teams.objects.get(id=id))
 
-                return Response(team, status=status.HTTP_200_OK) 
-            except Teams.DoesNotExist:
-                return Response({
-                    "status": 400,
+                if request.auth and request.auth.key:
+                    logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.path}": Got team "{team["name"]}"')
+                return Response(team, status=status.HTTP_200_OK)
+            except Teams.DoesNotExist as e:
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
                     "message": f"There is no team with the id {id}"
-                }, status=status.HTTP_400_BAD_REQUEST) 
+                }
+                if request.auth and request.auth.key:
+                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                return Response(response, status=response["status"]) 
         else:
             # check for other ways of team identification
             try:
@@ -120,12 +136,18 @@ def teams(request, id=None):
 
                 teams = [_get_team(team_object) for team_object in team_objects]
 
+                if request.auth and request.auth.key:
+                    team_names = ", ".join([f'"{team["name"]}"' for team in teams])
+                    logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.path}": Got teams {team_names} successfully')
                 return Response(teams[0] if len(teams) == 1 else teams, status=status.HTTP_200_OK)
-            except Teams.DoesNotExist:
-                return Response({
-                    "status": 400,
+            except Teams.DoesNotExist as e:
+                response = {
+                    "status": HTTP_400_BAD_REQUEST,
                     "message": f"There is no team with that identification"
-                }, status=status.HTTP_400_BAD_REQUEST) 
+                }
+                if request.auth and request.auth.key:
+                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                return Response(response, status=response["status"]) 
 
     if request.method == "DELETE":
         if id is not None:
@@ -137,20 +159,26 @@ def teams(request, id=None):
 
                 team.delete()
 
-                return Response({
-                    "status": 200,
-                    "message": f"Deleted team {team.name}"
-                }, status=status.HTTP_200_OK) 
-            except Teams.DoesNotExist:
-                return Response({
-                    "status": 400,
+                response = {
+                    "status": status.HTTP_200_OK,
+                    "message": f"Deleted team {team.name} successfully"
+                }
+                logger.warning(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                return Response(response, status=response["status"])
+            except Teams.DoesNotExist as e:
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
                     "message": f"There is no team with the id {id}"
-                }, status=status.HTTP_400_BAD_REQUEST) 
+                }
+                logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                return Response(response, status=response["status"])
         else:
-            return Response({
-                "status": 400,
+            response = {
+                "status": status.HTTP_400_BAD_REQUEST,
                 "message": "Missing team identifier"
-            }, status=status.HTTP_400_BAD_REQUEST) 
+            }
+            logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+            return Response(response, status=response["status"])
 
     if request.method == "PATCH":
         try:
@@ -165,36 +193,45 @@ def teams(request, id=None):
                             if field == "name":
                                 try:
                                     Teams.objects.get(name=data[field])
-                                    return Response({
-                                        "status": 400,
+                                    response = {
+                                        "status": status.HTTP_400_BAD_REQUEST,
                                         "message": f"A team with the name {data[field]} already exists"
-                                    }, status=status.HTTP_400_BAD_REQUEST)
+                                    }
+                                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                                    return Response(response, status=response["status"])
                                 except Teams.DoesNotExist:
                                     pass
                                 
                             setattr(team, field, data[field])
 
                     team.save()
-                    return Response({
-                        "status": 200,
-                        "message": f"Updated team {team.name}"
-                    }, status=status.HTTP_200_OK) 
-                except Teams.DoesNotExist:
-                    return Response({
-                        "status": 400,
+                    response = {
+                        "status": status.HTTP_200_OK,
+                        "message": f"Updated team {team.name} successfully"
+                    }
+                    logger.info(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                    return Response(response, status=response["status"])
+                except Teams.DoesNotExist as e:
+                    response = {
+                        "status": status.HTTP_400_BAD_REQUEST,
                         "message": f"There is no team with the id {id}"
-                    }, status=status.HTTP_400_BAD_REQUEST) 
+                    }
+                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                    return Response(response, status=response["status"])
             else:
-                return Response({
-                    "status": 400,
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
                     "message": "Missing team identifier"
-                }, status=status.HTTP_400_BAD_REQUEST)
+                }
+                logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                return Response(response, status=response["status"])
         except ValueError as e:
-            return Response({
-                "status": 400,
-                "message": "Invalid JSON format",
-                "error": str(e)
-            }, status=status.HTTP_400_BAD_REQUEST)
+            response = {
+                "status": status.HTTP_400_BAD_REQUEST,
+                "message": "Invalid JSON format"
+            }
+            logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+            return Response(response, status=response["status"])
 
 def _get_team(team_object):
     team = model_to_dict(team_object)
@@ -232,18 +269,22 @@ def members(request, id=None):
                     Members.objects.get(nmec=data["nmec"])
 
                     # if already exists, break
-                    return Response({
-                        "status": 400,
+                    response = {
+                        "status": status.HTTP_400_BAD_REQUEST,
                         "message": f"A member with the nmec {data['nmec']} already exists"
-                    }, status=status.HTTP_400_BAD_REQUEST)
+                    }
+                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                    return Response(response, status=response["status"])
                 except Members.DoesNotExist:
                     try:
                         team = Teams.objects.get(id=float(data['team']))
-                    except ValueError:
-                        return Response({
-                            "status": 400,
+                    except ValueError as e:
+                        response = {
+                            "status": status.HTTP_400_BAD_REQUEST,
                             "message": "Team id must be a number"
-                        }, status=status.HTTP_400_BAD_REQUEST)
+                        }
+                        logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                        return Response(response, status=response["status"])
 
                     member = Members(name=data['name'], nmec=data['nmec'], course=data['course'], team=team)
 
@@ -260,28 +301,35 @@ def members(request, id=None):
                                 member_bars_assoc = MembersBars(barId=bar, memberId=member)                        
                                 member_bars_assoc.save()
 
-                        return Response({
-                            "status": 200,
+                        response = {
+                            "status": status.HTTP_200_OK,
                             "message": f"Added member {data['name']} successfully to team {team.id}"
-                        }, status=status.HTTP_200_OK)
+                        }
+                        logger.info(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                        return Response(response, status=response["status"])
                     except Exception as e:
                         member.delete()
 
-                        return Response({
-                            "status": 500,
-                            "message": f"Could not add member {data['name']}",
-                            "error": str(e)
-                        },status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            except KeyError:
-                return Response({
-                    "status": 400,
+                        response = {
+                            "status": status.HTTP_400_BAD_REQUEST,
+                            "message": f"Error adding member {data['name']}"
+                        }
+                        logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                        return Response(response, status=response["status"])
+            except KeyError as e:
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
                     "message": "JSON Keys missing"
-                }, status=status.HTTP_400_BAD_REQUEST)
-        except ValueError:
-            return Response({
-                "status": 400,
+                }
+                logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                return Response(response, status=response["status"])
+        except ValueError as e:
+            response = {
+                "status": status.HTTP_400_BAD_REQUEST,
                 "message": "Invalid JSON format"
-            }, status=status.HTTP_400_BAD_REQUEST)
+            }
+            logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+            return Response(response, status=response["status"])
         
     if request.method == "GET":
         if id is not None:
@@ -289,11 +337,14 @@ def members(request, id=None):
                 member = _get_member(Members.objects.get(id=id))
 
                 return Response(member, status=status.HTTP_200_OK) 
-            except Teams.DoesNotExist:
-                return Response({
-                    "status": 400,
+            except Teams.DoesNotExist as e:
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
                     "message": f"There is no member with the id {id}"
-                }, status=status.HTTP_400_BAD_REQUEST) 
+                }
+                if request.auth and request.auth.key:
+                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                return Response(response, status=response["status"])
         else:
             # check for other ways of member identification
             try:
@@ -309,16 +360,21 @@ def members(request, id=None):
                     # return all members
                     member_objects = Members.objects.all()
 
-                members = []
-                for member_object in member_objects:
-                    members.append(_get_member(member_object))
+                members = [_get_member(member) for member in member_objects]
+
+                if request.auth and request.auth.key:
+                    member_names = ", ".join([f'"{member["name"]}"' for member in members])
+                    logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.path}": Got teams {member_names} successfully')
 
                 return Response(members[0] if len(members) == 1 else members, status=status.HTTP_200_OK)
-            except Teams.DoesNotExist:
-                return Response({
-                    "status": 400,
+            except Teams.DoesNotExist as e:
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
                     "message": f"There is no member with that identification"
-                }, status=status.HTTP_400_BAD_REQUEST) 
+                }
+                if request.auth and request.auth.key:
+                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                return Response(response, status=response["status"])
 
     if request.method == "DELETE":
         if id is not None:
@@ -326,20 +382,26 @@ def members(request, id=None):
                 member = Members.objects.get(id=id)
                 member.delete()
 
-                return Response({
-                    "status": 200,
-                    "message": f"Deleted member {member.name} from team {member.team.name}"
-                }, status=status.HTTP_200_OK) 
-            except Members.DoesNotExist:
-                return Response({
-                    "status": 400,
+                response = {
+                    "status": status.HTTP_200_OK,
+                    "message": f"Deleted member {member.name} successfully from team {member.team.name}"
+                }
+                logger.warning(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                return Response(response, status=response["status"])
+            except Members.DoesNotExist as e:
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
                     "message": f"There is no member with the id {id}"
-                }, status=status.HTTP_400_BAD_REQUEST) 
+                }
+                logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                return Response(response, status=response["status"])
         else:
-            return Response({
-                "status": 400,
+            response = {
+                "status": status.HTTP_400_BAD_REQUEST,
                 "message": "Missing member identifier"
-            }, status=status.HTTP_400_BAD_REQUEST)
+            }
+            logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+            return Response(response, status=response["status"])
         
     if request.method == "PATCH":
         try:
@@ -354,37 +416,46 @@ def members(request, id=None):
                             if field == "nmec":
                                 try:
                                     Members.objects.get(nmec=data[field])
-                                    return Response({
-                                        "status": 400,
-                                        "message": f"A member with the nmec {data[field]} already exists"
-                                    }, status=status.HTTP_400_BAD_REQUEST)
+                                    response = {
+                                        "status": status.HTTP_400_BAD_REQUEST,
+                                        "message": f"Member with nmec {data[field]} already exists"
+                                    }
+                                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                                    return Response(response, status=response["status"])
                                 except Members.DoesNotExist:
                                     pass
                                 
                             setattr(member, field, data[field])
 
                     member.save()
-                    return Response({
-                        "status": 200,
-                        "message": f"Updated member {member.name} with nmec {member.nmec}"
-                    }, status=status.HTTP_200_OK) 
-                except Teams.DoesNotExist:
-                    return Response({
-                        "status": 400,
-                        "message": f"There is no member with the id {id}"
-                    }, status=status.HTTP_400_BAD_REQUEST) 
-            else:
-                return Response({
-                    "status": 400,
-                    "message": "Missing member identifier"
-                }, status=status.HTTP_400_BAD_REQUEST)
-        except ValueError as e:
-            return Response({
-                "status": 400,
-                "message": "Invalid JSON format",
-                "error": str(e)
-            }, status=status.HTTP_400_BAD_REQUEST)
 
+                    response = {
+                        "status": status.HTTP_200_OK,
+                        "message": f"Updated member {member.name} successfully with nmec {member.nmec}"
+                    }
+                    logger.info(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                    return Response(response, status=response["status"])
+                except Teams.DoesNotExist as e:
+                    response = {
+                        "status": status.HTTP_400_BAD_REQUEST,
+                        "message": f"There is no member with the id {id}"
+                    }
+                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                    return Response(response, status=response["status"])
+            else:
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
+                    "message": "Missing member identifier"
+                }
+                logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                return Response(response, status=response["status"])
+        except ValueError as e:
+            response = {
+                "status": status.HTTP_400_BAD_REQUEST,
+                "message": "Invalid JSON format"
+            }
+            logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+            return Response(response, status=response["status"])
 
 def _get_member(member_object):
     member = model_to_dict(member_object)

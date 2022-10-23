@@ -5,6 +5,10 @@ from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
+from neectrally.settings import BASE_DIR
+
+from . import logger
+
 class AccountManager(BaseUserManager):
 
 	def create_user(self, username, password=None):
@@ -55,4 +59,10 @@ class Account(AbstractBaseUser):
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
 	if created:
-		Token.objects.create(user=instance)
+		token = Token.objects.create(user=instance)
+
+		# create logging file to /static/logs
+		open(f"{BASE_DIR}/static/logs/{token.key}.log", "w").close() 
+
+		# write first log
+		logger.info(token.key, f"User {instance.username}{f'({instance.name})' if instance.name is not None else ''} created with token {token.key}")

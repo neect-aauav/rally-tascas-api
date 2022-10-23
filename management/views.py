@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.response import Response
@@ -7,6 +6,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 
 from .serializers import RegistrationSerializer
+from management import logger
 
 @api_view(["POST"])
 @permission_classes((IsAuthenticated,))
@@ -18,18 +18,25 @@ def register(request):
             if serializer.is_valid():
                 account = serializer.save()
                 token = Token.objects.get(user=account).key
-                return Response({
-                    "status": 200,
-                    "message": f"Successfully registered admin user {account.username}",
+
+                response = {
+                    "status": status.HTTP_201_CREATED,
+                    "message": f"Successfully created admin user {account.username}",
                     "token": token
-                }, status=status.HTTP_200_OK)
+                }
+                logger.info(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                return Response(response, status=response["status"])
             else:
-                return Response({
-                    "status": 400,
-                    "message": "Something went wrong... Could not create admin user"
-                }, status=status.HTTP_400_BAD_REQUEST)
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
+                    "message": f"Failed to create admin user {request.data['username']}"
+                }
+                logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                return Response(response, status=response["status"])
         else:
-            return Response({
-                "status": 401,
+            response = {
+                "status": status.HTTP_401_UNAUTHORIZED,
                 "message": "You are not authorized to create admin users"
-            }, status=status.HTTP_401_UNAUTHORIZED)
+            }
+            logger.warning(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+            return Response(response, status=response["status"])
