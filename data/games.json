@@ -1,0 +1,47 @@
+[
+    {
+        "name": "Mimisutra",
+        "description": "",
+        "points": 10
+    },
+    {
+        "name": "Penalti mais rápido",
+        "description": "",
+        "points": 10
+    },
+    {
+        "name": "Cantar acapella",
+        "description": "",
+        "points": 10
+    },
+    {
+        "name": "Ligar para alguém",
+        "description": "Ligar para alguém aleatório e dizer na chamada as palavras que vão sendo dadas",
+        "points": 10
+    },
+    {
+        "name": "Pack 5 Shots",
+        "description": "Alguém beber 5 shots seguidos",
+        "points": 10
+    },
+    {
+        "name": "Caixa fechada",
+        "description": "Tentar adivihar o que está dentro da caixa",
+        "points": 10
+    },
+    {
+        "name": "Atirar bola",
+        "description": "Atirar uma bola contra uma torre de latas",
+        "points": 10
+    },
+    {
+        "name": "Banco/roda humana",
+        "description": "",
+        "points": 10
+    },
+    {
+        "name": "Colheres em Estafeta",
+        "description": "",
+        "points": 10
+    }
+]

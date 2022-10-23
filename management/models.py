@@ -28,6 +28,12 @@ class AccountManager(BaseUserManager):
 		user.is_staff = True
 		user.is_superuser = True
 		user.save(using=self._db)
+
+		# save superuser token to secrets.py file
+		token = Token.objects.get(user=user).key
+		with open(f"{BASE_DIR}/neectrally/secrets.py", "a") as f:
+			f.write(f"\n\n#superuser token\nSUPER_USER_TOKEN = '{token}'\n")
+
 		return user
 
 class Account(AbstractBaseUser):

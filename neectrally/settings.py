@@ -75,6 +75,7 @@ MIDDLEWARE = [
 
 CORS_ORIGIN_ALLOW_ALL = True
 
+# enable CORS for preflight operations
 CORS_ALLOW_HEADERS = ('Authorization', 'Content-Type', 'Cache-Control', 'X-Requested-With')
 
 ROOT_URLCONF = 'neectrally.urls'

@@ -1,0 +1,80 @@
+[
+    {
+        "team": "Crocodiles",
+        "email": "example@example.com",
+        "members": [
+            {
+                "name": "John Doe",
+                "nmec": 1234567,
+                "course": "Computadores e Telemática"
+            },
+            {
+                "name": "Jane Doe",
+                "nmec": 4123123,
+                "course": "Computadores e Telemática"
+            },
+            {
+                "name": "John Smith",
+                "nmec": 231234,
+                "course": "Computadores e Telemática"
+            },
+            {
+                "name": "Jane Smith",
+                "nmec": 5235233,
+                "course": "Eletrónica e Telecomunicações"
+            }
+        ]
+    },
+    {
+        "team": "Turtles",
+        "email": "example@example.com",
+        "members": [
+            {
+                "name": "Diogo Correia",
+                "nmec": 90327,
+                "course": "Computadores e Telemática"
+            },
+            {
+                "name": "João Silva",
+                "nmec": 90328,
+                "course": "Computadores e Telemática"
+            },
+            {
+                "name": "Pedro Santos",
+                "nmec": 90329,
+                "course": "Computadores e Telemática"
+            },
+            {
+                "name": "Rui Costa",
+                "nmec": 90330,
+                "course": "Eletrónica e Telecomunicações"
+            }
+        ]
+    },
+    {
+        "team": "Dolphins",
+        "email": "example@example.com",
+        "members": [
+            {
+                "name": "Joana Silva",
+                "nmec": 90331,
+                "course": "Computadores e Telemática"
+            },
+            {
+                "name": "Ana Costa",
+                "nmec": 90332,
+                "course": "Computadores e Telemática"
+            },
+            {
+                "name": "Sara Santos",
+                "nmec": 90333,
+                "course": "Computadores e Telemática"
+            },
+            {
+                "name": "Marta Costa",
+                "nmec": 90334,
+                "course": "Eletrónica e Telecomunicações"
+            }
+        ]
+    }
+]

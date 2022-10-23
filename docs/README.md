@@ -171,7 +171,7 @@ Add a new team to the database.
 **Request Body**
 ```json5
 {
-    "name": "Crocodiles",
+    "team": "Crocodiles",
     "email": "example@example.com",
     "members": [
         {
@@ -187,7 +187,7 @@ Add a new team to the database.
 #### **Fields**
 | ID | Mandatory | Data Type |
 |----|:---------:|-----------|
-| **name** | ✔ | string |
+| **team** | ✔ | string |
 | **email** | ✔ | string |
 | **members** | ✔ | list<[Member](#Members)> |
 
