@@ -489,10 +489,12 @@ def bars(request, id=None):
                     Bars.objects.get(name=data["name"])
 
                     # if already exists, break
-                    return Response({
-                        "status": 400,
-                        "message": f"A bar with the name {data['name']} already exists"
-                    }, status=status.HTTP_400_BAD_REQUEST)
+                    response = {
+                        "status": status.HTTP_400_BAD_REQUEST,
+                        "message": f"Bar with name {data['name']} already exists"
+                    }
+                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                    return Response(response, status=response["status"])
                 except Bars.DoesNotExist:
                     if "game" in data:
                         game = Games.objects.get(id=data["game"])
@@ -525,29 +527,35 @@ def bars(request, id=None):
                                 member_bars_assoc = MembersBars(barId=bar, memberId=member)
                                 member_bars_assoc.save()
 
-                        return Response({
-                            "status": 200,
-                            "message": f"Added bar {data['name']} successfully"
-                        }, status=status.HTTP_200_OK)
+                        response = {
+                            "status": status.HTTP_200_CREATED,
+                            "message": f"Created bar {bar.name} successfully"
+                        }
+                        logger.info(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                        return Response(response, status=response["status"])
                     except Exception as e:
-                        # bar.delete()
+                        bar.delete()
 
-                        return Response({
-                            "status": 500,
+                        response = {
+                            "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
                             "message": f"Could not add bar {data['name']}",
-                            "error": str(e)
-                        },status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            except KeyError:
-                return Response({
-                    "status": 400,
-                    "message": "JSON Keys missing"
-                }, status=status.HTTP_400_BAD_REQUEST)
+                        }
+                        logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                        return Response(response, status=response["status"])
+            except KeyError as e:
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
+                    "message": f"JSON Keys missing"
+                }
+                logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                return Response(response, status=response["status"])
         except ValueError as e:
-            return Response({
-                "status": 400,
-                "message": "Invalid JSON format",
-                "error": str(e) 
-            }, status=status.HTTP_400_BAD_REQUEST)
+            response = {
+                "status": status.HTTP_400_BAD_REQUEST,
+                "message": "Invalid JSON format"
+            }
+            logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+            return Response(response, status=response["status"])
 
     if request.method == "GET":
         if id is not None:
@@ -558,12 +566,17 @@ def bars(request, id=None):
                 if bar_object.game is not None:
                     bar["game"] = model_to_dict(bar_object.game)
 
+                if request.auth and request.auth.key:
+                    logger.info(request.auth.key, f'[{status.HTTP_200_OK}][@{request.path}]: Got bar {bar["name"]} successfully')
                 return Response(bar, status=status.HTTP_200_OK) 
-            except Bars.DoesNotExist:
-                return Response({
-                    "status": 400,
+            except Bars.DoesNotExist as e:
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
                     "message": f"There is no bar with the id {id}"
-                }, status=status.HTTP_400_BAD_REQUEST) 
+                }
+                if request.auth and request.auth.key:
+                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                return Response(response, status=response["status"])
         else:
             # check for other ways of team identification
             try:
@@ -583,12 +596,18 @@ def bars(request, id=None):
                     
                     bars.append(bar)
 
+                if request.auth and request.auth.key:
+                    bar_names = ", ".join([f'"{bar["name"]}"' for bar in bars])
+                    logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.path}": Got bars {bar_names} successfully')
                 return Response(bars[0] if len(bars) == 1 else bars, status=status.HTTP_200_OK)
-            except Bars.DoesNotExist:
-                return Response({
-                    "status": 400,
-                    "message": f"There is no bar with that identification"
-                }, status=status.HTTP_400_BAD_REQUEST)
+            except Bars.DoesNotExist as e:
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
+                    "message": "There is no bar with that identification"
+                }
+                if request.auth and request.auth.key:
+                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                return Response(response, status=response["status"])
         
     if request.method == "DELETE":
         if id is not None:
@@ -596,20 +615,26 @@ def bars(request, id=None):
                 bar = Bars.objects.get(id=id)
                 bar.delete()
 
-                return Response({
-                    "status": 200,
-                    "message": f"Deleted bar {bar.name}"
-                }, status=status.HTTP_200_OK) 
-            except Bars.DoesNotExist:
-                return Response({
-                    "status": 400,
+                response = {
+                    "status": status.HTTP_200_OK,
+                    "message": f"Deleted bar {bar.name} successfully"
+                }
+                logger.warning(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                return Response(response, status=response["status"])
+            except Bars.DoesNotExist as e:
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
                     "message": f"There is no bar with the id {id}"
-                }, status=status.HTTP_400_BAD_REQUEST) 
+                }
+                logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                return Response(response, status=response["status"])
         else:
-            return Response({
-                "status": 400,
+            response = {
+                "status": status.HTTP_400_BAD_REQUEST,
                 "message": "Missing bar identifier"
-            }, status=status.HTTP_400_BAD_REQUEST) 
+            }
+            logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+            return Response(response, status=response["status"])
 
     if request.method == "PATCH":
         try:
@@ -624,10 +649,13 @@ def bars(request, id=None):
                             if field == "name":
                                 try:
                                     Bars.objects.get(name=data[field])
-                                    return Response({
-                                        "status": 400,
-                                        "message": f"A bar with the name {data[field]} already exists"
-                                    }, status=status.HTTP_400_BAD_REQUEST)
+
+                                    response = {
+                                        "status": status.HTTP_400_BAD_REQUEST,
+                                        "message": f"There is already a bar with the name {data[field]}"
+                                    }
+                                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                                    return Response(response, status=response["status"])
                                 except Members.DoesNotExist:
                                     pass
 
@@ -637,35 +665,45 @@ def bars(request, id=None):
                                     game = Games.objects.get(id=data[field])
                                     setattr(bar, field, game)
                                     continue
-                                except Games.DoesNotExist:
-                                    return Response({
-                                        "status": 400,
+                                except Games.DoesNotExist as e:
+                                    response = {
+                                        "status": status.HTTP_400_BAD_REQUEST,
                                         "message": f"There is no game with the id {data[field]}"
-                                    }, status=status.HTTP_400_BAD_REQUEST)
+                                    }
+                                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                                    return Response(response, status=response["status"])
                                 
                             setattr(bar, field, data[field])
 
                     bar.save()
-                    return Response({
-                        "status": 200,
-                        "message": f"Updated bar {bar.name}"
-                    }, status=status.HTTP_200_OK) 
-                except Teams.DoesNotExist:
-                    return Response({
-                        "status": 400,
+
+                    response = {
+                        "status": status.HTTP_200_OK,
+                        "message": f"Updated bar {bar.name} successfully"
+                    }
+                    logger.info(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                    return Response(response, status=response["status"])
+                except Teams.DoesNotExist as e:
+                    response = {
+                        "status": status.HTTP_400_BAD_REQUEST,
                         "message": f"There is no bar with the id {id}"
-                    }, status=status.HTTP_400_BAD_REQUEST) 
+                    }
+                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                    return Response(response, status=response["status"])
             else:
-                return Response({
-                    "status": 400,
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
                     "message": "Missing bar identifier"
-                }, status=status.HTTP_400_BAD_REQUEST)
+                }
+                logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                return Response(response, status=response["status"])
         except ValueError as e:
-            return Response({
-                "status": 400,
-                "message": "Invalid JSON format",
-                "error": str(e)
-            }, status=status.HTTP_400_BAD_REQUEST)
+            response = {
+                "status": status.HTTP_400_BAD_REQUEST,
+                "message": "Invalid JSON format"
+            }
+            logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+            return Response(response, status=response["status"])
 
 @api_view(["POST", "GET"])
 @csrf_exempt
@@ -795,33 +833,42 @@ def qrcodes(request, id=None):
 
                 team.save()
 
-                return Response({
-                    "status": 200,
-                    "message": f"Created qrcode at {qr_name} for team {team.id}"
-                },status=status.HTTP_200_OK)
+                response = {
+                    "status": status.HTTP_200_OK,
+                    "message": f"QR code generated for team {team.name}",
+                }
+                logger.info(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                return Response(response, status=response["status"])
 
             # get qrcode path
             if request.method == "GET":
+                if request.auth and request.auth.key:
+                    logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.path}": Viewed QR code of team {team.name}')
                 return redirect(f'/static/qrcodes/qr_team{team.id}.png')
 
             if request.method == "DELETE":
                 os.remove(f'{BASE_DIR}/static/qrcodes/qr_team{team.id}.png')
                 
-                return Response({
-                    "status": 200,
-                    "message": f"Deleted qrcode for team {team.id}"
-                },status=status.HTTP_200_OK)
-
-        except Teams.DoesNotExist:
-            return Response({
-                "status": 400,
+                response = {
+                    "status": status.HTTP_200_OK,
+                    "message": f"QR code deleted for team {team.name}",
+                }
+                logger.warning(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                return Response(response, status=response["status"])
+        except Teams.DoesNotExist as e:
+            response = {
+                "status": status.HTTP_400_BAD_REQUEST,
                 "message": f"A team with the id {id} doesn't exist"
-            },status=status.HTTP_400_BAD_REQUEST)
+            }
+            logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+            return Response(response, status=response["status"])
     else:
-        return Response({
-            "status": 400,
+        response = {
+            "status": status.HTTP_400_BAD_REQUEST,
             "message": "Missing team ID"
-        }, status=status.HTTP_400_BAD_REQUEST)
+        }
+        logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+        return Response(response, status=response["status"])
 
 
 @api_view(["POST", "GET", "DELETE", "PATCH"])
@@ -836,37 +883,47 @@ def games(request, id=None):
                     Games.objects.get(name=data["name"])
 
                     # if already exists, break
-                    return Response({
-                        "status": 400,
+                    response = {
+                        "status": status.HTTP_400_BAD_REQUEST,
                         "message": f"A game with the name {data['name']} already exists"
-                    }, status=status.HTTP_400_BAD_REQUEST)
+                    }
+                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                    return Response(response, status=response["status"])
                 except Games.DoesNotExist:
                     game = Games(name=data['name'], description=data['description'], points=data['points'])
 
                     try:
                         game.save()
 
-                        return Response({
-                            "status": 200,
+                        response = {
+                            "status": status.HTTP_200_OK,
                             "message": f"Added game {data['name']} successfully"
-                        }, status=status.HTTP_200_OK)
-                    except Exception:
+                        }
+                        logger.info(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                        return Response(response, status=response["status"])
+                    except Exception as e:
                         game.delete()
 
-                        return Response({
-                            "status": 500,
+                        response = {
+                            "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
                             "message": f"Could not add game {data['name']}"
-                        },status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            except KeyError:
-                return Response({
-                    "status": 400,
-                    "message": "JSON Keys missing"
-                }, status=status.HTTP_400_BAD_REQUEST)
-        except ValueError:
-            return Response({
-                "status": 400,
+                        }
+                        logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                        return Response(response, status=response["status"])
+            except KeyError as e:
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
+                    "message": f"JSON Keys missing"
+                }
+                logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                return Response(response, status=response["status"])
+        except ValueError as e:
+            response = {
+                "status": status.HTTP_400_BAD_REQUEST,
                 "message": "Invalid JSON format"
-            }, status=status.HTTP_400_BAD_REQUEST)
+            }
+            logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+            return Response(response, status=response["status"])
 
     if request.method == "GET":
         if id is not None:
@@ -874,12 +931,16 @@ def games(request, id=None):
                 game_object = Games.objects.get(id=id)
                 game = model_to_dict(game_object)
 
+                if request.auth and request.auth.key:
+                    logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.path}": Got game {game["name"]} sucessfully')
                 return Response(game, status=status.HTTP_200_OK) 
-            except Games.DoesNotExist:
-                return Response({
-                    "status": 400,
+            except Games.DoesNotExist as e:
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
                     "message": f"There is no game with the id {id}"
-                }, status=status.HTTP_400_BAD_REQUEST) 
+                }
+                logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                return Response(response, status=response["status"])
         else:
             # check for other ways of game identification
             try:
@@ -898,12 +959,18 @@ def games(request, id=None):
                     game = model_to_dict(game_object)
                     games.append(game)
 
+                if request.auth and request.auth.key:
+                    game_names = ", ".join([f'"{game["name"]}"' for game in games])
+                    logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.path}": Got games {game_names} successfully')
                 return Response(games[0] if len(games) == 1 else games, status=status.HTTP_200_OK)
-            except Games.DoesNotExist:
-                return Response({
-                    "status": 400,
+            except Games.DoesNotExist as e:
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
                     "message": f"There is no bar with that identification"
-                }, status=status.HTTP_400_BAD_REQUEST)
+                }
+                if request.auth and request.auth.key:
+                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                return Response(response, status=response["status"])
         
     if request.method == "DELETE":
         if id is not None:
@@ -911,20 +978,26 @@ def games(request, id=None):
                 game = Games.objects.get(id=id)
                 game.delete()
 
-                return Response({
-                    "status": 200,
-                    "message": f"Deleted game {game.name}"
-                }, status=status.HTTP_200_OK) 
-            except Games.DoesNotExist:
-                return Response({
-                    "status": 400,
+                response = {
+                    "status": status.HTTP_200_OK,
+                    "message": f"Deleted game {game.name} successfully"
+                }
+                logger.warning(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                return Response(response, status=response["status"])
+            except Games.DoesNotExist as e:
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
                     "message": f"There is no game with the id {id}"
-                }, status=status.HTTP_400_BAD_REQUEST) 
+                }
+                logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                return Response(response, status=response["status"])
         else:
-            return Response({
-                "status": 400,
+            response = {
+                "status": status.HTTP_400_BAD_REQUEST,
                 "message": "Missing game identifier"
-            }, status=status.HTTP_400_BAD_REQUEST)
+            }
+            logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+            return Response(response, status=response["status"])
 
     if request.method == "PATCH":
         try:
@@ -939,36 +1012,46 @@ def games(request, id=None):
                             if field == "name":
                                 try:
                                     Games.objects.get(name=data[field])
-                                    return Response({
-                                        "status": 400,
-                                        "message": f"A game with the name {data[field]} already exists"
-                                    }, status=status.HTTP_400_BAD_REQUEST)
+                                    response = {
+                                        "status": status.HTTP_400_BAD_REQUEST,
+                                        "message": f"Game with name {data[field]} already exists"
+                                    }
+                                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                                    return Response(response, status=response["status"])
                                 except Games.DoesNotExist:
                                     pass
                                 
                             setattr(game, field, data[field])
 
                     game.save()
-                    return Response({
-                        "status": 200,
-                        "message": f"Updated game {game.name}"
-                    }, status=status.HTTP_200_OK) 
-                except Teams.DoesNotExist:
-                    return Response({
-                        "status": 400,
+
+                    response = {
+                        "status": status.HTTP_200_OK,
+                        "message": f"Updated game {game.name} successfully"
+                    }
+                    logger.info(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                    return Response(response, status=response["status"])
+                except Teams.DoesNotExist as e:
+                    response = {
+                        "status": status.HTTP_400_BAD_REQUEST,
                         "message": f"There is no game with the id {id}"
-                    }, status=status.HTTP_400_BAD_REQUEST) 
+                    }
+                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                    return Response(response, status=response["status"])
             else:
-                return Response({
-                    "status": 400,
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
                     "message": "Missing game identifier"
-                }, status=status.HTTP_400_BAD_REQUEST)
+                }
+                logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                return Response(response, status=response["status"])
         except ValueError as e:
-            return Response({
-                "status": 400,
-                "message": "Invalid JSON format",
-                "error": str(e)
-            }, status=status.HTTP_400_BAD_REQUEST)
+            response = {
+                "status": status.HTTP_400_BAD_REQUEST,
+                "message": "Invalid JSON format"
+            }
+            logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+            return Response(response, status=response["status"])
 
 
 @api_view(["POST", "GET", "DELETE", "PATCH"])
@@ -983,37 +1066,47 @@ def prizes(request, id=None):
                     Prizes.objects.get(name=data["name"])
 
                     # if already exists, break
-                    return Response({
-                        "status": 400,
-                        "message": f"A prize with the name {data['name']} already exists"
-                    }, status=status.HTTP_400_BAD_REQUEST)
+                    response = {
+                        "status": status.HTTP_400_BAD_REQUEST,
+                        "message": f"Prize with name {data['name']} already exists"
+                    }
+                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                    return Response(response, status=response["status"])
                 except Prizes.DoesNotExist:
                     prize = Prizes(name=data['name'], place=data['place'], ammount=data['ammount'])
 
                     try:
                         prize.save()
 
-                        return Response({
-                            "status": 200,
-                            "message": f"Added prize {data['name']} successfully"
-                        }, status=status.HTTP_200_OK)
-                    except Exception:
+                        response = {
+                            "status": status.HTTP_200_OK,
+                            "message": f"Added prize {prize.name} successfully"
+                        }
+                        logger.info(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                        return Response(response, status=response["status"])
+                    except Exception as e:
                         prize.delete()
 
-                        return Response({
-                            "status": 500,
+                        response = {
+                            "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
                             "message": f"Could not add prize {data['name']}"
-                        },status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            except KeyError:
-                return Response({
-                    "status": 400,
+                        }
+                        logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                        return Response(response, status=response["status"])
+            except KeyError as e:
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
                     "message": "JSON Keys missing"
-                }, status=status.HTTP_400_BAD_REQUEST)
-        except ValueError:
-            return Response({
-                "status": 400,
+                }
+                logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                return Response(response, status=response["status"])
+        except ValueError as e:
+            response = {
+                "status": status.HTTP_400_BAD_REQUEST,
                 "message": "Invalid JSON format"
-            }, status=status.HTTP_400_BAD_REQUEST)
+            }
+            logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+            return Response(response, status=response["status"])
 
     if request.method == "GET":
         if id is not None:
@@ -1025,12 +1118,17 @@ def prizes(request, id=None):
                 if prize_object.winner is not None:
                     prize["winner"] = model_to_dict(prize_object.winner)
 
+                if request.auth and request.auth.key:
+                    logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.path}": Got prize {prize["name"]} successfully')
                 return Response(prize, status=status.HTTP_200_OK) 
-            except Prizes.DoesNotExist:
-                return Response({
-                    "status": 400,
+            except Prizes.DoesNotExist as e:
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
                     "message": f"There is no prize with the id {id}"
-                }, status=status.HTTP_400_BAD_REQUEST) 
+                }
+                if request.auth and request.auth.key:
+                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                return Response(response, status=response["status"])
         else:
             # check for other ways of game identification
             try:
@@ -1056,12 +1154,18 @@ def prizes(request, id=None):
                     
                     prizes.append(prize)
 
+                if request.auth and request.auth.key:
+                    prize_names = ", ".join([f'"{prize["name"]}"' for prize in prizes])
+                    logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.path}": Got prizes {prize_names} successfully')
                 return Response(prizes[0] if len(prizes) == 1 else prizes, status=status.HTTP_200_OK)
-            except Prizes.DoesNotExist:
-                return Response({
-                    "status": 400,
-                    "message": f"There is no bar with that identification"
-                }, status=status.HTTP_400_BAD_REQUEST)
+            except Prizes.DoesNotExist as e:
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
+                    "message": "There is no prize with that identification"
+                }
+                if request.auth and request.auth.key:
+                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                return Response(response, status=response["status"])
         
     if request.method == "DELETE":
         if id is not None:
@@ -1069,20 +1173,26 @@ def prizes(request, id=None):
                 prize = Prizes.objects.get(id=id)
                 prize.delete()
 
-                return Response({
-                    "status": 200,
-                    "message": f"Deleted prize {prize.name}"
-                }, status=status.HTTP_200_OK) 
-            except Prizes.DoesNotExist:
-                return Response({
-                    "status": 400,
+                response = {
+                    "status": status.HTTP_200_OK,
+                    "message": f"Deleted prize {prize.name} successfully"
+                }
+                logger.warning(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                return Response(response, status=response["status"])
+            except Prizes.DoesNotExist as e:
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
                     "message": f"There is no prize with the id {id}"
-                }, status=status.HTTP_400_BAD_REQUEST) 
+                }
+                logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                return Response(response, status=response["status"])
         else:
-            return Response({
-                "status": 400,
+            response = {
+                "status": status.HTTP_400_BAD_REQUEST,
                 "message": "Missing prize identifier"
-            }, status=status.HTTP_400_BAD_REQUEST) 
+            }
+            logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+            return Response(response, status=response["status"])
 
     if request.method == "PATCH":
         try:
@@ -1097,10 +1207,13 @@ def prizes(request, id=None):
                             if field == "place":
                                 try:
                                     Prizes.objects.get(place=data[field])
-                                    return Response({
-                                        "status": 400,
-                                        "message": f"A prize for the place {data[field]} already exists"
-                                    }, status=status.HTTP_400_BAD_REQUEST)
+
+                                    response = {
+                                        "status": status.HTTP_400_BAD_REQUEST,
+                                        "message": f"A prize for the place {data[field]} already exists",
+                                    }
+                                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                                    return Response(response, status=response["status"])
                                 except Prizes.DoesNotExist:
                                     pass
 
@@ -1110,35 +1223,45 @@ def prizes(request, id=None):
                                     team = Teams.objects.get(id=data[field])
                                     setattr(prize, field, team)
                                     continue
-                                except Teams.DoesNotExist:
-                                    return Response({
-                                        "status": 400,
-                                        "message": f"There is no team with the id {data[field]}"
-                                    }, status=status.HTTP_400_BAD_REQUEST)
+                                except Teams.DoesNotExist as e:
+                                    response = {
+                                        "status": status.HTTP_400_BAD_REQUEST,
+                                        "message": f"There is no team with the id {data[field]}",
+                                    }
+                                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                                    return Response(response, status=response["status"])
                                 
                             setattr(prize, field, data[field])
 
                     prize.save()
-                    return Response({
-                        "status": 200,
-                        "message": f"Updated prize {prize.name}"
-                    }, status=status.HTTP_200_OK) 
-                except Teams.DoesNotExist:
-                    return Response({
-                        "status": 400,
+
+                    response = {
+                        "status": status.HTTP_200_OK,
+                        "message": f"Updated prize {prize.name} successfully"
+                    }
+                    logger.info(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                    return Response(response, status=response["status"])
+                except Teams.DoesNotExist as e:
+                    response = {
+                        "status": status.HTTP_400_BAD_REQUEST,
                         "message": f"There is no prize with the id {id}"
-                    }, status=status.HTTP_400_BAD_REQUEST) 
+                    }
+                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                    return Response(response, status=response["status"])
             else:
-                return Response({
-                    "status": 400,
+                response = {
+                    "status": status.HTTP_400_BAD_REQUEST,
                     "message": "Missing prize identifier"
-                }, status=status.HTTP_400_BAD_REQUEST)
+                }
+                logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                return Response(response, status=response["status"])
         except ValueError as e:
-            return Response({
-                "status": 400,
-                "message": "Invalid JSON format",
-                "error": str(e)
-            }, status=status.HTTP_400_BAD_REQUEST)
+            response = {
+                "status": status.HTTP_400_BAD_REQUEST,
+                "message": "Invalid JSON format"
+            }
+            logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+            return Response(response, status=response["status"])
 
 def _handle_points(data, members, method):
         if "members" in data:

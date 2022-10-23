@@ -26,7 +26,7 @@ for tag in TAGS:
         # generate bar objects
         success = 0
         for object in objects:
-            req = requests.post(f'http://127.0.0.1:8000/api/{tag}', json=object, headers=HEADERS)
+            req = requests.post(f'http://localhost:8000/api/{tag}', json=object, headers=HEADERS)
             response = req.json()
             print(f"  [{response['status']}] {response['message']}")
             if req.status_code == 200:
