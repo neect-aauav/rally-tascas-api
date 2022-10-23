@@ -43,11 +43,16 @@ def teams(request, id=None):
                             team = Teams(name=data['team'], email=data['email'])
                             team.save()
 
+                            headers = {
+                                'Content-Type': 'application/json',
+                                'Authorization': f'Token {request.auth.key}',
+                            }
+
                             # loop through members
                             for member in data['members']:
                                 member["team"] = team.id
                                 print(member)
-                                requests.post(f'http://{request.get_host()}/api/members', json=member)
+                                requests.post(f'http://{request.get_host()}/api/members', json=member, headers=headers)
 
                             # create assoc team <-> bars
                             all_bars = Bars.objects.all()
