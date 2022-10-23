@@ -1,4 +1,5 @@
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import redirect
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -728,7 +729,7 @@ def qrcodes(request, id=None):
 
             # get qrcode path
             if request.method == "GET":
-                return Response({"qrcode": team.qr_code}, status=status.HTTP_200_OK)
+                return redirect(f'/static/qrcodes/qr_team{team.id}.png')
 
             if request.method == "DELETE":
                 os.remove(f'{BASE_DIR}/static/qrcodes/qr_team{team.id}.png')
