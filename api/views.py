@@ -497,8 +497,10 @@ def bars(request, id=None):
                     if "game" in data:
                         game = Games.objects.get(id=data["game"])
                         bar = Bars(name=data['name'], address=data['address'], latitude=data['latitude'], longitude=data['longitude'], picture=data['picture'], game=game)
-                    else:
+                    elif "picture" in data:
                         bar = Bars(name=data['name'], address=data['address'], latitude=data['latitude'], longitude=data['longitude'], picture=data['picture'])
+                    else:
+                        bar = Bars(name=data['name'], address=data['address'], latitude=data['latitude'], longitude=data['longitude'])
 
                     try:
                         bar.save()

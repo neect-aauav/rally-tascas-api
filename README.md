@@ -5,32 +5,37 @@ This application was created using **Python** and **Django**.
 
 ## Setup
 - Setup MySQL database
-```
+```bash
 $ chmod +x setup_mysql.sh
 $ ./setup_mysql.sh
 ```
 Use ```./setup_mysql.sh -h``` to see usage options.
 
 - Create and enter a python virtual environment 
-```
+```bash
 $ python3 -m venv venv
 $ source venv/bin/activate
 ```
 
 - Install necessary packages
-```
-$ pip install -r requirements.txt
+```bash
+$ pip3 install -r requirements.txt
 ```
 
 - Run API server
-```
+```bash
 $ python3 manage.py migrate &&
     python3 manage.py runserver
 ```
 
 - Kill port 8000 if occupied (in case runserver fails)
-```
+```bash
 $ sudo fuser -n tcp -k 8000
+```
+
+- (Optional) Create superuser
+```bash
+$ python3 manage.py createsuperuser
 ```
 
 ## API Docs
