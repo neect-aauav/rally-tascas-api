@@ -6,6 +6,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 from . import views
 from management import views as management_views 
+from rallytascas import views as rallytascas_views
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -55,4 +56,7 @@ urlpatterns = [
     path('prizes', views.prizes),
     # /prizes/<id>
     path('prizes/<slug:id>', views.prizes),
+    
+    # /teamplay
+    path('teamplay', rallytascas_views.teamplay),
 ]

@@ -49,6 +49,7 @@ INSTALLED_APPS = [
 
     'api',
     'management',
+    'rallytascas',
 ]
 
 REST_FRAMEWORK = {

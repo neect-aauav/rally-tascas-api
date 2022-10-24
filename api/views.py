@@ -51,7 +51,6 @@ def teams(request, id=None):
                             # loop through members
                             for member in data['members']:
                                 member["team"] = team.id
-                                print(member)
                                 requests.post(f'http://{request.get_host()}/api/members', json=member, headers=headers)
 
                             # create assoc team <-> bars
@@ -147,7 +146,7 @@ def teams(request, id=None):
                 return Response(teams[0] if len(teams) == 1 else teams, status=status.HTTP_200_OK)
             except Teams.DoesNotExist as e:
                 response = {
-                    "status": HTTP_400_BAD_REQUEST,
+                    "status": status.HTTP_400_BAD_REQUEST,
                     "message": f"There is no team with that identification"
                 }
                 if request.auth and request.auth.key:
@@ -208,6 +207,28 @@ def teams(request, id=None):
                                     pass
                                 
                             setattr(team, field, data[field])
+
+                    # update team bar association if given
+                    if "bar" in data:
+                        try:
+                            bar_data = data["bar"]
+                            bar = Bars.objects.get(id=bar_data["id"])
+
+                            team_bars_assoc = TeamsBars.objects.get(team=team.id, bar=bar_data["id"])
+                            team_bars_assoc.visited = True
+                            team_bars_assoc.points += bar_data["points"]
+                            team_bars_assoc.drinks += bar_data["drinks"]
+                            team_bars_assoc.has_egg = bar_data["has_egg"]
+                            team_bars_assoc.puked = bar_data["puked"]
+                            team_bars_assoc.won_game = bar_data["won_game"]
+                            team_bars_assoc.save()
+                        except Bars.DoesNotExist as e:
+                            response = {
+                                "status": status.HTTP_400_BAD_REQUEST,
+                                "message": f"There is no bar with the id {data['bar']}"
+                            }
+                            logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                            return Response(response, status=response["status"])
 
                     team.save()
                     response = {
@@ -431,6 +452,24 @@ def members(request, id=None):
                                     pass
                                 
                             setattr(member, field, data[field])
+
+                    # update members bar association if given
+                    if "bar" in data:
+                        try:
+                            bar_data = data["bar"]
+                            bar = Bars.objects.get(id=bar_data["id"])
+
+                            member_bars_assoc = MembersBars.objects.get(member=member.id, bar=bar_data["id"])
+                            member_bars_assoc.points += bar_data["points"]
+                            member_bars_assoc.drinks += bar_data["drinks"]
+                            member_bars_assoc.save()
+                        except Bars.DoesNotExist as e:
+                            response = {
+                                "status": status.HTTP_400_BAD_REQUEST,
+                                "message": f"There is no bar with the id {data['bar']}"
+                            }
+                            logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                            return Response(response, status=response["status"])
 
                     member.save()
 

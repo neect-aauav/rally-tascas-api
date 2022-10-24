@@ -51,10 +51,13 @@ Please refer to [Symbol Keys](#symbol-keys) before reading the documentation on 
 
 ### Administration    
 
-1. [Admin](#admin)
-    1. [Create Admin Account](#create-admin-account)
-    1. [Get Admin Token](#get-admin-token)
-    1. [Validate Admin Token](#validate-admin-token)
+1. [Create Admin Account](#create-admin-account)
+1. [Get Admin Token](#get-admin-token)
+1. [Validate Admin Token](#validate-admin-token)
+
+### Rally Tascas Oriented Endpoints
+
+1. [Team Play](#team-play)
 
 ---
 
@@ -223,7 +226,8 @@ Must specify the team ID.
 Update a team's information.  
 Provide the team ID and the fields to be updated.  
 Unspecified fields will be left unchanged.  
-Updatable fields are: ***name, email, points, drinks, has_egg, puked***
+Updatable fields are: ***name, email, points, drinks, has_egg, puked***  
+An optional field ***bar*** can be provided to update the team's performance on a specific bar. If this field is passed, it should be a JSON object with the following mandatory fields: ***id, points, drinks, has_egg, puked, won_game***
 
 **HTTP Request**
 
@@ -339,7 +343,8 @@ Must specify the member ID.
 Update a member's information.  
 Provide the member ID and the fields to be updated.  
 Unspecified fields will be left unchanged.  
-Updatable fields are: ***name, nmec, course, team, points, drinks***
+Updatable fields are: ***name, nmec, course, team, points, drinks***  
+An optional field ***bar*** can be provided to update the member's performance on a specific bar. If this field is passed, it should be a JSON object with the following mandatory fields: ***id, points, drinks***
 
 **HTTP Request**
 
@@ -714,7 +719,8 @@ Must be superuser to use.
 
 ## Get Admin Token
 
-Get an admin token to use in the Authorization header of requests.
+Get an admin token to use in the Authorization header of requests.  
+A valid admin account must me passed in the request body.
 
 **HTTP Request**
 
@@ -741,11 +747,6 @@ Get an admin token to use in the Authorization header of requests.
     "token": "<random_value>"
 }
 ```
-
-#### **Fields**
-| ID | Data Type |
-|----|-----------|
-| **token** | string |
 
 ---
 
@@ -778,3 +779,61 @@ Check if a token, passed in the body of the request, is valid.
     "is_superuser": true
 }
 ```
+
+---
+
+## Team Play
+
+Perform a "play" action for a team. This is used to register a team's performance in a given bar.  
+This involves adding points and drinks to the team's score and also distribute this through the members of the team.
+
+**HTTP Request**
+
+``` POST .../api/teamplay``` [🔑](#make-a-http-request)
+
+**Request Body**
+```json5
+{
+    "team_id": 1,
+    "bar_id": 1,
+    "game_completed": true,
+    "points": 10,
+    "drinks": 2,
+    "has_egg": true,
+    "puked": 2,
+    "members": [
+        {
+            "id": 1,
+            "points": 5,
+            "drinks": 1
+        },
+        {
+            "id": 2,
+            "points": 5,
+            "drinks": 1
+        },
+        {
+            "id": 3,
+            "points": 0,
+            "drinks": 0
+        }
+    ]
+}
+```
+
+#### **Fields**
+| ID | Name | Mandatory | Data Type | Description |
+|----|------|:---------:|-----------|-------------|
+| **team_id** | Team ID | ✔ | integer | The ID of the team. |
+| **bar_id** | Bar ID | ✔ | integer | The ID of the bar visited bt the team. |
+| **game** | Game | ✔ | object | The game that was played. |
+| **game.id** | Game ID | ✔ | integer | The ID of the game that was played. |
+| **game.completed** | Game Completed | ✔ | boolean | Whether the game was completed or not. |
+| **points** | Points | ✔ | integer | The number of points the team scored. |
+| **drinks** | Drinks | ✔ | integer | The number of drinks the team drank. |
+| **has_egg** | Has Egg | ✔ | boolean | Whether the team has the egg or not. |
+| **puked** | Puked | ✔ | integer | The number of times the team puked. |
+| **members** | Members | ✔ | array | The members of the team. |
+| **members.id** | Member ID | ✔ | integer | The ID of the member. |
+| **members.points** | Points | ✔ | integer | The number of points the member scored. |
+| **members.drinks** | Drinks | ✔ | integer | The number of drinks the member drank. |
