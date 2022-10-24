@@ -3,48 +3,56 @@
         "name": "Casa Pina",
         "address": "R. Antónia Rodrigues 36, 3800-102 Aveiro",
         "latitude": 40.64382661695054,
-        "longitude": -8.655127674722474
+        "longitude": -8.655127674722474,
+        "game": 1
     },
     {
         "name": "Posto 7",
         "address": "Largo da Praça do Peixe 30, 3800-209 Aveiro",
         "latitude": 40.64291964216214,
-        "longitude": -8.654945888213359
+        "longitude": -8.654945888213359,
+        "game": 2
     },
     {
         "name": "Golfinho Bar",
         "address": "R. do Ten. Rezende 9, 3800-202 Aveiro",
         "latitude": 40.64235063917928,
-        "longitude": -8.65385375752226
+        "longitude": -8.65385375752226,
+        "game": 3
     },
     {
         "name": "Dokk Club",
         "address": "Largo da Praça do Peixe 42, 3800-209 Aveiro",
         "latitude": 40.64236057534645,
-        "longitude": -8.655132403558937
+        "longitude": -8.655132403558937,
+        "game": 4
     },
     {
         "name": "Parque da Macaca / McDonald's",
         "address": "R. das Pombas, 3810-150 Aveiro",
         "latitude": 40.63259224969681,
-        "longitude": -8.651403558885985
+        "longitude": -8.651403558885985,
+        "game": 5
     },
     {
         "name": "Drinks",
         "address": "R. Homem Cristo Filho 4, 3810-100 Aveiro",
         "latitude": 40.63895655972107,
-        "longitude": -8.656326457457263
+        "longitude": -8.656326457457263,
+        "game": 6
     },
     {
         "name": "Meia Lua",
         "address": "Campus Universitário de Santiago, Universidade de Aveiro, 3810-193 Aveiro",
         "latitude": 40.6295750080371,
-        "longitude": -8.656427584219601
+        "longitude": -8.656427584219601,
+        "game": 7
     },
     {
         "name": "ESSUA",
         "address": "Campus Universitário de Santiago, Agra do Crasto, Edifício 30, 3810-193 Aveiro",
         "latitude": 40.62365311138041,
-        "longitude": -8.657516997204388
+        "longitude": -8.657516997204388,
+        "game": 8
     }
 ]

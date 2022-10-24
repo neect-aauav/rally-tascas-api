@@ -11,7 +11,7 @@ HEADERS = {
     'Authorization': f'Token {SUPER_USER_TOKEN}',
 }
 
-TAGS = ['teams', 'bars', 'games', 'prizes']
+TAGS = ['teams', 'games', 'bars', 'prizes']
 
 for tag in TAGS:
     # generate <tag> from <tag>.json

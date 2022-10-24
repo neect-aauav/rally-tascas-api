@@ -540,9 +540,12 @@ def bars(request, id=None):
                     logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
                     return Response(response, status=response["status"])
                 except Bars.DoesNotExist:
-                    if "game" in data:
+                    if "game" in data and "picture" in data:
                         game = Games.objects.get(id=data["game"])
                         bar = Bars(name=data['name'], address=data['address'], latitude=data['latitude'], longitude=data['longitude'], picture=data['picture'], game=game)
+                    elif "game" in data:
+                        game = Games.objects.get(id=data["game"])
+                        bar = Bars(name=data['name'], address=data['address'], latitude=data['latitude'], longitude=data['longitude'], game=game)
                     elif "picture" in data:
                         bar = Bars(name=data['name'], address=data['address'], latitude=data['latitude'], longitude=data['longitude'], picture=data['picture'])
                     else:
