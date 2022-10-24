@@ -533,7 +533,7 @@ def bars(request, id=None):
                                 member_bars_assoc.save()
 
                         response = {
-                            "status": status.HTTP_200_CREATED,
+                            "status": status.HTTP_200_OK,
                             "message": f"Created bar {bar.name} successfully"
                         }
                         logger.info(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
