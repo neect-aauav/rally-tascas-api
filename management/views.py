@@ -25,21 +25,21 @@ def register(request):
                     "message": f"Successfully created admin user {account.username}",
                     "token": token
                 }
-                logger.info(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                logger.info(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
                 return Response(response, status=response["status"])
             else:
                 response = {
                     "status": status.HTTP_400_BAD_REQUEST,
                     "message": f"Failed to create admin user {request.data['username']}"
                 }
-                logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
                 return Response(response, status=response["status"])
         else:
             response = {
                 "status": status.HTTP_401_UNAUTHORIZED,
                 "message": "You are not authorized to create admin users"
             }
-            logger.warning(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+            logger.warning(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
             return Response(response, status=response["status"])
 
 
@@ -61,7 +61,7 @@ def check_token(request):
                 "is_superuser": user.is_superuser
             }
             if request.auth and request.auth.key:
-                logger.info(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]}')
+                logger.info(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
             return Response(response, status=response["status"])
         except Token.DoesNotExist as e:
             response = {
@@ -69,7 +69,7 @@ def check_token(request):
                 "message": f"Token {data['token']} is invalid"
             }
             if request.auth and request.auth.key:
-                logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
             return Response(response, status=response["status"])
         except Exception as e:
             response = {
@@ -77,5 +77,5 @@ def check_token(request):
                 "message": f"Failed to check token"
             }
             if request.auth and request.auth.key:
-                logger.error(request.auth.key, f'[{response["status"]}]@"{request.path}": {response["message"]} ({e})')
+                logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
             return Response(response, status=response["status"])
