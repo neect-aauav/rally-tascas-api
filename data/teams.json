@@ -1,7 +1,7 @@
 [
     {
         "team": "Crocodiles",
-        "email": "example@example.com",
+        "phone": 912345678,
         "members": [
             {
                 "name": "John Doe",
@@ -27,7 +27,7 @@
     },
     {
         "team": "Turtles",
-        "email": "example@example.com",
+        "phone": 912345678,
         "members": [
             {
                 "name": "Diogo Correia",
@@ -53,7 +53,7 @@
     },
     {
         "team": "Dolphins",
-        "email": "example@example.com",
+        "phone": 912345678,
         "members": [
             {
                 "name": "Joana Silva",

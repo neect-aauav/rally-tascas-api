@@ -2,7 +2,7 @@ from django.db import models
 
 class Teams(models.Model):
 	name = models.CharField(max_length=255)
-	email = models.CharField(max_length=255)
+	phone = models.IntegerField()
 	points = models.IntegerField(default=0)
 	drinks = models.IntegerField(default=0)
 	qr_code = models.CharField(max_length=255, default="")

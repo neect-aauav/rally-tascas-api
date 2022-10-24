@@ -111,7 +111,7 @@ Example of the information fetched from **/teams**:
 {
     "id": 1,
     "name": "Crocodiles",
-    "email": "example@example.com",
+    "phone": 912345678,
     "points": 45,
     "drinks": 3,
     "qr_code": "http://127.0.0.1:8000/qrcodes/qr_team1.png",
@@ -143,7 +143,7 @@ Example of the information fetched from **/teams**:
 |----|------|-----------|:-------:| ----------- |
 | **id** | Team ID | integer | 🔄 | Team number identifier | 
 | **name** | Name | string | ✖ | Team name | 
-| **email** | Email | string | ✖ | Team email |
+| **phone** | Phone Number | integer | ✖ | Team phone number |
 | **points** | Points | integer | 0 | Total number of points won |
 | **drinks** | Drinks | integer | 0 | Total number of drinks |
 | **qr_code** | QR Code | string | 🔄 | URL to the team's QR Code image |
@@ -176,7 +176,7 @@ Add a new team to the database.
 ```json5
 {
     "team": "Crocodiles",
-    "email": "example@example.com",
+    "phone": 912345678,
     "members": [
         {
             "name": "John Doe",
@@ -192,7 +192,7 @@ Add a new team to the database.
 | ID | Mandatory | Data Type |
 |----|:---------:|-----------|
 | **team** | ✔ | string |
-| **email** | ✔ | string |
+| **phone** | ✔ | integer |
 | **members** | ✔ | list<[Member](#Members)> |
 
 ### Get Team
@@ -200,7 +200,7 @@ Add a new team to the database.
 Get teams from the database.  
 If no team ID is specified, all teams are returned.  
 URL parameters can be used to get teams by other fields.  
-Accepted URL parameters are: **name**, **email**, **id**.
+Accepted URL parameters are: **name**, **phone**, **id**.
 
 **HTTP Request**
 
@@ -226,7 +226,7 @@ Must specify the team ID.
 Update a team's information.  
 Provide the team ID and the fields to be updated.  
 Unspecified fields will be left unchanged.  
-Updatable fields are: ***name, email, points, drinks, has_egg, puked***  
+Updatable fields are: ***name, phone, points, drinks, has_egg, puked***  
 An optional field ***bar*** can be provided to update the team's performance on a specific bar. If this field is passed, it should be a JSON object with the following mandatory fields: ***id, points, drinks, has_egg, puked, won_game***
 
 **HTTP Request**

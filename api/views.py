@@ -40,7 +40,7 @@ def teams(request, id=None):
                         return Response(response, status=response["status"])
                     except Teams.DoesNotExist:
                         try:
-                            team = Teams(name=data['team'], email=data['email'])
+                            team = Teams(name=data['team'], phone=data['phone'])
                             team.save()
 
                             headers = {
@@ -130,8 +130,8 @@ def teams(request, id=None):
             try:
                 if request.GET.get("name"):
                     team_objects = [Teams.objects.get(name=request.GET.get("name"))]
-                elif request.GET.get("email"):
-                    team_objects = [Teams.objects.get(email=request.GET.get("email"))]
+                elif request.GET.get("phone"):
+                    team_objects = [Teams.objects.get(phone=request.GET.get("phone"))]
                 elif request.GET.get("id"):
                     team_objects = [Teams.objects.get(id=request.GET.get("id"))]
                 else:
@@ -190,7 +190,7 @@ def teams(request, id=None):
             if id is not None:
                 try:
                     team = Teams.objects.get(id=id)
-                    modifiable_fields = ["name", "email", "points", "drinks", "has_egg", "puked"]
+                    modifiable_fields = ["name", "phone", "points", "drinks", "has_egg", "puked"]
                     for field in modifiable_fields:
                         if field in data:
                             # if field is name, check if it already exists
@@ -377,7 +377,7 @@ def members(request, id=None):
                 if request.GET.get("name"):
                     member_objects = [Members.objects.get(name=request.GET.get("name"))]
                 elif request.GET.get("nmec"):
-                    member_objects = [Members.objects.get(email=request.GET.get("nmec"))]
+                    member_objects = [Members.objects.get(nmec=request.GET.get("nmec"))]
                 elif request.GET.get("id"):
                     member_objects = [Members.objects.get(id=request.GET.get("id"))]
                 elif request.GET.get("course"):
