@@ -54,6 +54,7 @@ Please refer to [Symbol Keys](#symbol-keys) before reading the documentation on 
 1. [Admin](#admin)
     1. [Create Admin Account](#create-admin-account)
     1. [Get Admin Token](#get-admin-token)
+    1. [Validate Admin Token](#validate-admin-token)
 
 ---
 
@@ -717,7 +718,7 @@ Get an admin token to use in the Authorization header of requests.
 
 **HTTP Request**
 
-``` POST .../api/token```
+``` POST .../api/login```
 
 **Request Body**
 ```json5
@@ -745,3 +746,35 @@ Get an admin token to use in the Authorization header of requests.
 | ID | Data Type |
 |----|-----------|
 | **token** | string |
+
+---
+
+## Validate Admin Token
+
+Check if a token, passed in the body of the request, is valid.
+
+**HTTP Request**
+
+``` POST .../api/token```
+
+**Request Body**
+```json5
+{
+    "token": "<random_value>"
+}
+```
+
+#### **Fields**
+| ID | Mandatory | Data Type |
+|----|:---------:|-----------|
+| **token** | ✔ | string |
+
+** Response Body**
+```json5
+{
+    "status": 200,
+    "message": "Token <random_value> is valid",
+    "username": "john",
+    "is_superuser": true
+}
+```
