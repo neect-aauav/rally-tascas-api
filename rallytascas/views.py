@@ -7,9 +7,9 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-from api.models import MembersBars, Teams, Members, Bars, TeamsBars, Games, Prizes
-from django.forms.models import model_to_dict
+import functools
 
+from api.models import MembersBars, Teams, Members, Bars, TeamsBars, Games, Prizes
 from management import logger
 
 @api_view(["POST"])
@@ -25,6 +25,17 @@ def teamplay(request):
                 game = Games.objects.get(id=bar.game.id)
 
                 if len(data["members"]) > 0:
+                    
+                    # verify if points from team match points from members
+                    members_points = [member["points"] for member in data["members"]]
+                    if sum(members_points) != data["points"]:
+                        response = {
+                            "status": status.HTTP_400_BAD_REQUEST,
+                            "message": "Points from team and members don't match"
+                        }
+                        logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
+                        return Response(response, status=response["status"])
+
                     # if the objects team, bar game and members exist, proceed to save the teamplay
                     headers = {
                         "Content-Type": "application/json",
