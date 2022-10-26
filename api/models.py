@@ -21,6 +21,7 @@ class Members(models.Model):
 class Games(models.Model):
 	name = models.CharField(max_length=255)
 	description = models.TextField(default="")
+	points = models.IntegerField(default=0)
 	completed = models.IntegerField(default=0)
 
 class Bars(models.Model):
