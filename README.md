@@ -89,7 +89,7 @@ mysql> SET GLOBAL validate_password_policy=0;
 
 3. Change the root password
 ```sql
-mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'new_password';
 mysql> FLUSH PRIVILEGES;
 mysql> exit
 ```

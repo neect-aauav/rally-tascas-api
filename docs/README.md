@@ -51,9 +51,13 @@ Please refer to [Symbol Keys](#symbol-keys) before reading the documentation on 
 
 ### Administration    
 
-1. [Create Admin Account](#create-admin-account)
-1. [Get Admin Token](#get-admin-token)
-1. [Validate Admin Token](#validate-admin-token)
+1. [Admin Account](#admin-account)
+    1. [Create Admin Account](#create-admin-account)
+    1. [Get Admin Account](#get-admin-account)
+    1. [Update Admin Account](#update-admin-account)
+1. [Tokens](#tokens)
+    1. [Get Admin Token](#get-admin-token)
+    1. [Validate Admin Token](#validate-admin-token)
 
 ### Rally Tascas Oriented Endpoints
 
@@ -686,7 +690,12 @@ Must specify the team ID.
 
 ---
 
-## Create Admin Account
+## Admin Account
+
+The admin account is used to manage the teams perfomance in each bar.  
+Many of the endpoints in this API require a token from an admin account to be passed in the header.
+
+### Create Admin Account
 
 Create an admin account to manage teams, members, bars, games and prizes.  
 Must be superuser to use.
@@ -715,9 +724,53 @@ Must be superuser to use.
 | **password** | ✔ | string |
 | **bar** | ✖ | [Bar](#bars) |
 
+### Get Admin Account
+
+Get the information of an admin account from a provided token.  
+The token must be passed in the url path.  
+If the Authorization token provided in the header does not match the token in the url path, the request will fail, unless the Authorization token is a superuser token.
+
+**HTTP Request**
+
+``` GET .../api/admin/{token}``` [🔑](#make-a-http-request)
+
+**Response Body**
+
+```json5
+{
+    "username": "digas99",
+    "is_superuser": false,
+    "name": "Diogo Correia",
+    "nmec": 90327,
+    "last_login": "2022-10-26T01:09:24.390443Z",
+    "date_joined": "2022-10-26T01:06:24.143393Z",
+    "is_admin": true,
+    "is_staff": true,
+    "bar": {
+        ...
+    }
+}
+```
+
+### Update Admin Account
+
+Update an admin account's information.  
+The token must be passed in the url path.  
+If the Authorization token provided in the header does not match the token in the url path, the request will fail, unless the Authorization token is a superuser token.  
+Updatable fields are: ***name, nmec, username, password, bar***.
+
+**HTTP Request**
+
+``` PATCH .../api/admin/{token}``` [🔑](#make-a-http-request)
+
 ---
 
-## Get Admin Token
+## Tokens
+
+When an admin account is created, a token is generated and saved in the database.  
+Tokens are used to identify admins and to make requests to the API.
+
+### Get Admin Token
 
 Get an admin token to use in the Authorization header of requests.  
 A valid admin account must me passed in the request body.
@@ -750,7 +803,7 @@ A valid admin account must me passed in the request body.
 
 ---
 
-## Validate Admin Token
+### Validate Admin Token
 
 Check if a token, passed in the body of the request, is valid.
 
@@ -770,13 +823,12 @@ Check if a token, passed in the body of the request, is valid.
 |----|:---------:|-----------|
 | **token** | ✔ | string |
 
-** Response Body**
+**Response Body**
 ```json5
 {
     "status": 200,
     "message": "Token <random_value> is valid",
-    "username": "john",
-    "is_superuser": true
+    "valid": true
 }
 ```
 

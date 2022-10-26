@@ -29,6 +29,8 @@ urlpatterns = [
     path('login', obtain_auth_token),
     # admin /token
     path('token', management_views.check_token),
+    # admin /admin/<token>
+    path('admin/<slug:token>', management_views.admin),
 
     # /teams
     path('teams', views.teams),
