@@ -5,11 +5,11 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 
-import functools
+from django.forms.models import model_to_dict
 
-from api.models import MembersBars, Teams, Members, Bars, TeamsBars, Games, Prizes
+from api.models import MembersBars, Teams, Members, Bars, Games
 from management import logger
 
 @api_view(["POST"])
@@ -136,6 +136,92 @@ def teamplay(request):
             response = {
                 "status": status.HTTP_400_BAD_REQUEST,
                 "message": "Invalid JSON format"
+            }
+            logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
+            return Response(response, status=response["status"])
+
+        
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+@csrf_exempt
+def scoreboard_teams(request):
+    if request.method == "GET":
+        try:
+            teams = Teams.objects.all().order_by('-points')
+            
+            # iterate all teams
+            scoreboard = [[team.name, team.points, team.drinks] for team in teams]
+
+            logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.method} {request.path}": Teams scoreboard successfully retrieved')
+            return Response(scoreboard, status=status.HTTP_200_OK)
+        except Teams.DoesNotExist as e:
+            response = {
+                "status": status.HTTP_400_BAD_REQUEST,
+                "message": "There are no teams"
+            }
+            logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
+            return Response(response, status=response["status"])
+
+
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+@csrf_exempt
+def scoreboard_members(request, team=None):
+    if request.method == "GET":
+        try:
+            scoreboard = []
+
+            if team and team != "all":
+                members = Members.objects.filter(team=team).order_by('-points')
+                for member in members:
+                    member_score = [member.name]
+
+                    # get bars from this member
+                    member_score += [model_to_dict(row)['points'] for row in MembersBars.objects.filter(memberId=member.id)]
+
+                    member_score.append(member.points)
+
+                    scoreboard.append(member_score)
+            elif team == "all":
+                members = Members.objects.all().order_by('-points')
+
+                all_teams = Teams.objects.all()
+                for team in all_teams:
+                    members_score = []
+                    members_team = members.filter(team=team.id)
+                    for member in members_team:
+                        member_score = [member.name]
+
+                        # get bars from this member
+                        member_score += [model_to_dict(row)['points'] for row in MembersBars.objects.filter(memberId=member.id)]
+
+                        member_score.append(member.points)
+
+                        members_score.append(member_score)
+
+                    scoreboard.append({
+                        "team": team.name,
+                        "members": members_score
+                    })
+            else:
+                members = Members.objects.all().order_by('-points')
+
+                for member in members:
+                    member_score = [member.name]
+
+                    # get bars from this member
+                    member_score += [model_to_dict(row)['points'] for row in MembersBars.objects.filter(memberId=member.id)]
+
+                    member_score.append(member.points)
+
+                    scoreboard.append(member_score)
+
+            logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.method} {request.path}": Members scoreboard successfully retrieved')
+            return Response(scoreboard, status=status.HTTP_200_OK)
+        except Members.DoesNotExist as e:
+            response = {
+                "status": status.HTTP_400_BAD_REQUEST,
+                "message": "There are no members"
             }
             logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
             return Response(response, status=response["status"])

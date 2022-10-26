@@ -62,6 +62,9 @@ Please refer to [Symbol Keys](#symbol-keys) before reading the documentation on 
 ### Rally Tascas Oriented Endpoints
 
 1. [Team Play](#team-play)
+1. [Scoreboard](#scoreboard)
+    1. [Get Teams Scoreboard](#get-teams-scoreboard)
+    1. [Get Members Scoreboard](#get-members-scoreboard)
 
 ---
 
@@ -801,8 +804,6 @@ A valid admin account must me passed in the request body.
 }
 ```
 
----
-
 ### Validate Admin Token
 
 Check if a token, passed in the body of the request, is valid.
@@ -889,3 +890,65 @@ This involves adding points and drinks to the team's score and also distribute t
 | **members.id** | Member ID | ✔ | integer | The ID of the member. |
 | **members.points** | Points | ✔ | integer | The number of points the member scored. |
 | **members.drinks** | Drinks | ✔ | integer | The number of drinks the member drank. |
+
+---
+
+## Scoreboard
+
+Get an assembled scoreboard with teams and members.
+
+### Get Teams Scoreboard
+
+Get a scoreboard with all teams sorted by points.
+The response is an array where the first element is the team name, the second element is the team points and the third element is the team drinks.
+
+**HTTP Request**
+
+``` GET .../api/scoreboard/teams```
+
+**Response Body**
+```json5
+[
+    [
+        "Team 1",
+        10,
+        2
+    ],
+    ...
+]
+```
+
+### Get Members Scoreboard
+
+Get a scoreboard with all members.
+If a team ID is provided in the path, the scoreboard will only contain members of that team.
+To get all scores from all teams, put /all in the url path.
+The response is an array where the first element is the member name, the last element is the total number of points of that member and the elements in between are the points made in each bar.
+
+**HTTP Request**
+
+``` GET .../api/scoreboard/members```
+``` GET .../api/scoreboard/members/{team_id}```
+``` GET .../api/scoreboard/members/all```
+
+**Response Request**
+```json5
+[
+    {
+        "team": "Team 1",
+        "members": [
+            [
+                "Member 1",
+                10,
+                10,
+                10,
+                10,
+                10,
+                50
+            ],
+            ...
+        ]
+    },
+    ...
+]
+```
