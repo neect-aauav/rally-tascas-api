@@ -689,7 +689,7 @@ def bars(request, id=None):
             if id is not None:
                 try:
                     bar = Bars.objects.get(id=id)
-                    modifiable_fields = ["name", "address", "latitude", "longitude", "picture", "points", "drinks", "puked", "visited", "game"]
+                    modifiable_fields = ["name", "address", "latitude", "longitude", "picture", "points", "drinks", "puked", "game"]
                     for field in modifiable_fields:
                         if field in data:
                             # if field is name, check if it already exists

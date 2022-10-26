@@ -372,7 +372,6 @@ Example of the information fetched from **/bars**:
     "points": 45,
     "drinks": 3,
     "puked": 1,
-    "visited": 2,
     "game": {
         ...
     }
@@ -391,7 +390,6 @@ Example of the information fetched from **/bars**:
 | **points** | Points | integer | 0 | Total number of points won in the bar |
 | **drinks** | Drinks | integer | 0 | Total number of drinks in the bar |
 | **puked** | Puked | integer | 0 | Total number of puked drinks in the bar |
-| **visited** | Visited | integer | 0 | Total number of visits to the bar |
 | **game** | Game | [Game](#Games) | ␀ | Data from the bar's game |
 
 ### Add Bar
@@ -455,7 +453,7 @@ Must specify the bar ID.
 Update a bar's information.  
 Provide the bar ID and the fields to be updated.  
 Unspecified fields will be left unchanged.  
-Updatable fields are: ***name, address, latitude, longitude, picture, points, drinks, puked, visited, game***
+Updatable fields are: ***name, address, latitude, longitude, picture, points, drinks, puked, game***
 
 **HTTP Request**
 
@@ -703,7 +701,8 @@ Must be superuser to use.
     "name": "Admin",
     "nmec": 12345,
     "username": "admin",
-    "password": "admin"
+    "password": "admin",
+    "bar": 1
 }
 ```
 
@@ -714,6 +713,7 @@ Must be superuser to use.
 | **nmec** | ✔ | integer |
 | **username** | ✔ | string |
 | **password** | ✔ | string |
+| **bar** | ✖ | [Bar](#bars) |
 
 ---
 

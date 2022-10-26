@@ -8,6 +8,8 @@ This application was created using **Python** and **Django**.
 1. [Setup](#setup)
 1. [API Docs](#api-docs)
 1. [Generate Data](#generate-data)
+1. [Issues](#issues)
+    1. [MySQL Root Password](#mysql-root-password)
 
 ## Setup
 1. Setup MySQL database
@@ -68,3 +70,28 @@ You can generate bulks of data, dummy or not, to the database with the following
 cd data
 $ python3 generator.py
 ```
+
+## Issues
+
+### MySQL Root Password
+
+If you are having issues with the MySQL root password, try the following:
+
+1. Open the MySQL shell
+```bash
+$ sudo mysql
+```
+
+2. If you want to remove the password strenghten policy, run the following:
+```bash
+mysql> SET GLOBAL validate_password_policy=0;
+```
+
+3. Change the root password
+```sql
+mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+mysql> FLUSH PRIVILEGES;
+mysql> exit
+```
+
+4. Try to run the setup script again and use the new password

@@ -21,7 +21,6 @@ class Members(models.Model):
 class Games(models.Model):
 	name = models.CharField(max_length=255)
 	description = models.TextField(default="")
-	points = models.IntegerField()
 	completed = models.IntegerField(default=0)
 
 class Bars(models.Model):
@@ -33,7 +32,6 @@ class Bars(models.Model):
 	points = models.IntegerField(default=0)
 	drinks = models.IntegerField(default=0)
 	puked = models.IntegerField(default=0)
-	visited = models.IntegerField(default=0)
 	game = models.ForeignKey(Games, on_delete=(models.CASCADE), default=None, blank=True, null=True)
 
 class TeamsBars(models.Model):

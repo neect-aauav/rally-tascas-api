@@ -4,6 +4,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from api.models import Bars
 
 from neectrally.settings import BASE_DIR
 
@@ -40,6 +41,7 @@ class Account(AbstractBaseUser):
 
 	name = models.CharField(max_length=100, blank=True, null=True)
 	nmec = models.IntegerField(blank=True, null=True)
+	bar = models.ForeignKey(Bars, on_delete=models.CASCADE, blank=True, null=True)
 	username = models.CharField(max_length=30, unique=True)
 	date_joined = models.DateTimeField(verbose_name="date joined", auto_now_add=True)
 	last_login = models.DateTimeField(verbose_name="last login", auto_now=True)
