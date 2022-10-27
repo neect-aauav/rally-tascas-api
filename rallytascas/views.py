@@ -216,12 +216,14 @@ def scoreboard_members(request, team=None):
 
                     scoreboard.append(member_score)
 
-            logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.method} {request.path}": Members scoreboard successfully retrieved')
+            if request.auth and request.auth.key:
+                logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.method} {request.path}": Members scoreboard successfully retrieved')
             return Response(scoreboard, status=status.HTTP_200_OK)
         except Members.DoesNotExist as e:
             response = {
                 "status": status.HTTP_400_BAD_REQUEST,
                 "message": "There are no members"
             }
-            logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
+            if request.auth and request.auth.key:
+                logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
             return Response(response, status=response["status"])
