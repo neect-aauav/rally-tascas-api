@@ -5,11 +5,13 @@ charset-normalizer==2.1.1
 coreapi==2.3.3
 coreschema==0.0.4
 cryptography==38.0.1
+dj-database-url==1.0.0
 Django==4.1.2
 django-cors-headers==3.13.0
 django-extensions==3.2.1
 djangorestframework==3.14.0
 drf-yasg==1.21.4
+gunicorn==20.1.0
 idna==3.4
 inflection==0.5.1
 itypes==1.2.0
@@ -17,6 +19,7 @@ Jinja2==3.1.2
 MarkupSafe==2.1.1
 packaging==21.3
 Pillow==9.2.0
+psycopg2-binary==2.9.5
 pycparser==2.21
 PyMySQL==1.0.2
 pyparsing==3.0.9
@@ -28,3 +31,4 @@ ruamel.yaml.clib==0.2.7
 sqlparse==0.4.3
 uritemplate==4.1.1
 urllib3==1.26.12
+whitenoise==6.2.0
