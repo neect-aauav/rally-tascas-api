@@ -3,11 +3,14 @@ import requests
 
 import sys
 import os
+from pathlib import Path
+from decouple import config
 sys.path.append('../')
 
-from neectrally.settings import BASE_DIR, BASE_IRI
+BASE_DIR =  Path(os.environ.get('PROD_BASE_DIR')).as_posix() if os.environ.get('PROD_BASE_DIR') else Path(__file__).resolve().parent.parent
+BASE_IRI = os.environ.get('BASE_IRI') if os.environ.get('BASE_IRI') else 'http://localhost:8000'
 
-SUPER_USER_TOKEN = os.environ.get('SUPER_USER_TOKEN')
+SUPER_USER_TOKEN = os.environ.get('SUPER_USER_TOKEN') if os.environ.get('SUPER_USER_TOKEN') else config('SUPER_USER_TOKEN')
 
 HEADERS = {
     'Content-Type': 'application/json',

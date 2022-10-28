@@ -85,10 +85,6 @@ MIDDLEWARE = [
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-CORS_ORIGIN_WHITELIST = [
-     'http://localhost:3000', 'https://rally-tascas.herokuapp.com', 'http://rally-tascas.herokuapp.com'
-]
-
 # enable CORS for preflight operations
 CORS_ALLOW_HEADERS = ('Authorization', 'Content-Type', 'Cache-Control', 'X-Requested-With')
 
