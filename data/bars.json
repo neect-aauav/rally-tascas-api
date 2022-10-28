@@ -28,13 +28,6 @@
         "game": 4
     },
     {
-        "name": "Parque da Macaca / McDonald's",
-        "address": "R. das Pombas, 3810-150 Aveiro",
-        "latitude": 40.63259224969681,
-        "longitude": -8.651403558885985,
-        "game": 5
-    },
-    {
         "name": "Drinks",
         "address": "R. Homem Cristo Filho 4, 3810-100 Aveiro",
         "latitude": 40.63895655972107,
@@ -42,17 +35,31 @@
         "game": 6
     },
     {
+        "name": "Parque da Macaca / McDonald's",
+        "address": "R. das Pombas, 3810-150 Aveiro",
+        "latitude": 40.63259224969681,
+        "longitude": -8.651403558885985,
+        "game": 5
+    },
+    {
+        "name": "ISCA-UA",
+        "address": "Rua Associação Humanitária dos Bombeiros Voluntários de Aveiro, 3810-902 Aveiro",
+        "latitude": 40.6305634,
+        "longitude": -8.6557738,
+        "game": 7
+    },
+    {
         "name": "Meia Lua",
         "address": "Campus Universitário de Santiago, Universidade de Aveiro, 3810-193 Aveiro",
         "latitude": 40.6295750080371,
         "longitude": -8.656427584219601,
-        "game": 7
+        "game": 8
     },
     {
         "name": "ESSUA",
         "address": "Campus Universitário de Santiago, Agra do Crasto, Edifício 30, 3810-193 Aveiro",
         "latitude": 40.62365311138041,
         "longitude": -8.657516997204388,
-        "game": 8
+        "game": 9
     }
 ]
