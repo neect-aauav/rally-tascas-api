@@ -2,9 +2,11 @@ import json
 import requests
 
 import sys
+import os
 sys.path.append('../')
+from neectrally.settings import BASE_IRI
 
-from neectrally.secrets import SUPER_USER_TOKEN
+SUPER_USER_TOKEN = os.environ.get('PROD_BASE_DIR')
 
 HEADERS = {
     'Content-Type': 'application/json',
@@ -26,7 +28,7 @@ for tag in TAGS:
         # generate bar objects
         success = 0
         for object in objects:
-            req = requests.post(f'http://localhost:8000/api/{tag}', json=object, headers=HEADERS)
+            req = requests.post(f'{BASE_IRI}/api/{tag}', json=object, headers=HEADERS)
             response = req.json()
             print(f"  [{response['status']}] {response['message']}")
             if req.status_code == 200:
