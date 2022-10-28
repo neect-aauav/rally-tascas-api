@@ -1,1 +1,1 @@
-web: python manage.py migrate && gunicorn neectrally.wsgi
+web: python manage.py migrate management && python manage.py migrate api && python manage.py migrate rallytascas && python manage.py migrate && gunicorn neectrally.wsgi
