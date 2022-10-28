@@ -179,5 +179,720 @@
                 "course": ""
             }
         ]
+    }, {
+        "team": "Putaria",
+        "phone": 927373350,
+        "members": [
+            {
+                "name": "Rodrigo Soares",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Inês Almeida",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Francisca Soares",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Bernardo Sampaio",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Inês Guimarães",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "Homens da Pá",
+        "phone": 913598079,
+        "members": [
+            {
+                "name": "Tinoco",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Xico Zé",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Rafael Maio",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Rodrigo Domingues",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Pedro Machado",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "Poker alho",
+        "phone": 933393548,
+        "members": [
+            {
+                "name": "Bernardo Gomes",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "João Morais",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Duarte Martins",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Pedro Ferreira",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Tomás Oliveira",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "MecGregas",
+        "phone": 9334748931,
+        "members": [
+            {
+                "name": "Maria Barroqueiro",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Manuel Mineiro",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Ana Viriato",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Guilerme Patrício",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "António Ferreira",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "BBC",
+        "phone": 912696096,
+        "members": [
+            {
+                "name": "Fred",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Reis",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Carlos Azevedo",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "João",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Luísa",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "Os 4 e Meia",
+        "phone": 968137061,
+        "members": [
+            {
+                "name": "Miguel Monteiro",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Afonso Oliveira",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "José Fernandes",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Gonçalo Santana",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Rodrigo Duarte",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "20 Comer 100 Saber",
+        "phone": 962614036,
+        "members": [
+            {
+                "name": "Ricardo Silva",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Gabriela Silva",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Catarina Costa",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Inês Pereira",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Rui Silva",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "As Porcas",
+        "phone": 924087081,
+        "members": [
+            {
+                "name": "Rafaela Dias",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Mariana Perna",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Gonçalo Martins",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Nuno Cardoso",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Carolina Esperança",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "Pindorcas",
+        "phone": 960280605,
+        "members": [
+            {
+                "name": "Laura Almeida",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Beatriz Lopes",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Erica Preto",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Matilde Pinto",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Beatriz Damas",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "Os problemáticos",
+        "phone": 963840281,
+        "members": [
+            {
+                "name": "Beatriz Bastos",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "João Tristão",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Nuno Pinto",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Leonor Miranda",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "João Ramos",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "Drim Tim",
+        "phone": 926202404,
+        "members": [
+            {
+                "name": "Daniela Cruz",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Bernardo Fonseca",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Catarina Mota",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "João Lima",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Jorge Ferreira",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "Noja FC",
+        "phone": 655152425,
+        "members": [
+            {
+                "name": "David Galones",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Julio Bermudez",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Marti Roura",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Adrian Gonzalez",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Diego Sospedra",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "Fígados (i)mortais",
+        "phone": 968615844,
+        "members": [
+            {
+                "name": "António Lobo",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Lara Coito",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Rafaela Dias",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Joana Matos",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Beatriz Rodrigues",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "A.A (Alcoólicos Anónimos)",
+        "phone": 913782369,
+        "members": [
+            {
+                "name": "Hugo Malcato",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "José Santos",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Nuno Correia",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Xavier Pinto",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Simão Alves",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "Par para o cadáver",
+        "phone": 960488443,
+        "members": [
+            {
+                "name": "Nuno Cunha",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Nuno Matos",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "João Gonçalves",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Bernardo Kaluza",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "João Salgueiro",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "Mekitos",
+        "phone": 932508806,
+        "members": [
+            {
+                "name": "Daniel Neto",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Kalebe Ribeiro",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "José Silva",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "André Oliveira",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Fábio Gama",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "Los Matadores",
+        "phone": 961568576,
+        "members": [
+            {
+                "name": "João Duarte Sousa",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Daniel Malheiro",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Marina Alexandre",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Afonso Mesquita",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Francisco Mendes",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "Meia de leite",
+        "phone": 926417911,
+        "members": [
+            {
+                "name": "Rodrigo Santos",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Tatiana Duque",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Diana Isabel",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Flávio Silva",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Afonso Cardoso",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "Critix do Borel",
+        "phone": 934584527,
+        "members": [
+            {
+                "name": "Gonçalo Carvalho",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Joana Matias",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Leonor Canha",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Diogo dos Santos",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Raquel Pinto",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "Equipa cujo o nome estamos alcoolicamente impedidos de dizer",
+        "phone": 9366736119,
+        "members": [
+            {
+                "name": "Vicente Barros",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Daniel Ferreira",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Filipe Silveira",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Alexandre Gago",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Daniela Dias",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "Emborca Vejas",
+        "phone": 930453518,
+        "members": [
+            {
+                "name": "Maria João",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Francisco Gonçalves",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Vasco Soares",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Tiago Goucho",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "La Gente Fuelte",
+        "phone": 34675485494,
+        "members": [
+            {
+                "name": "Alvaro Marte Romero",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Manuel Perez Flores",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Javier Baron Soler",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Jose Miguel Filloy Ruiz",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Alejandro Bravo",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "São Gregório",
+        "phone": 917151007,
+        "members": [
+            {
+                "name": "Bernardo Marçal",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Gabriel Duarte Couto",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Alessandrro Signor",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Ricardo Machado",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Lourenço Figueiredo",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "Sacarrabos",
+        "phone": 914997841,
+        "members": [
+            {
+                "name": "Diogo Vicente",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Lara Rodrigues",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Rodrigo Santos",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "João Matias",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "David Bicho",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
     }
 ]
