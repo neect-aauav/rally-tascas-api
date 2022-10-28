@@ -180,7 +180,7 @@ def scoreboard_members(request, team=None):
                     member_score = [member.name]
 
                     # get bars from this member
-                    member_score += [model_to_dict(row)['points'] for row in MembersBars.objects.filter(memberId=member.id)]
+                    member_score += [model_to_dict(row)['points'] for row in MembersBars.objects.filter(memberId=member.id).order_by('id')]
 
                     member_score.append(member.points)
 
@@ -196,7 +196,7 @@ def scoreboard_members(request, team=None):
                         member_score = [member.name]
 
                         # get bars from this member
-                        member_score += [model_to_dict(row)['points'] for row in MembersBars.objects.filter(memberId=member.id)]
+                        member_score += [model_to_dict(row)['points'] for row in MembersBars.objects.filter(memberId=member.id).order_by('id')]
 
                         member_score.append(member.points)
 
@@ -213,7 +213,7 @@ def scoreboard_members(request, team=None):
                     member_score = [member.name]
 
                     # get bars from this member
-                    member_score += [model_to_dict(row)['points'] for row in MembersBars.objects.filter(memberId=member.id)]
+                    member_score += [model_to_dict(row)['points'] for row in MembersBars.objects.filter(memberId=member.id).order_by('id')]
 
                     member_score.append(member.points)
 

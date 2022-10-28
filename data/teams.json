@@ -1,79 +1,182 @@
 [
     {
-        "team": "Crocodiles",
-        "phone": 912345678,
+        "team": "Alcónicos Anólicos",
+        "phone": 966584027,
         "members": [
             {
-                "name": "John Doe",
-                "nmec": 1234567,
-                "course": "Computadores e Telemática"
-            },
-            {
-                "name": "Jane Doe",
-                "nmec": 4123123,
-                "course": "Computadores e Telemática"
-            },
-            {
-                "name": "John Smith",
-                "nmec": 231234,
-                "course": "Computadores e Telemática"
-            },
-            {
-                "name": "Jane Smith",
-                "nmec": 5235233,
-                "course": "Eletrónica e Telecomunicações"
-            }
-        ]
-    },
-    {
-        "team": "Turtles",
-        "phone": 912345678,
-        "members": [
-            {
-                "name": "Diogo Correia",
-                "nmec": 90327,
-                "course": "Computadores e Telemática"
-            },
-            {
-                "name": "João Silva",
-                "nmec": 90328,
-                "course": "Computadores e Telemática"
-            },
-            {
-                "name": "Pedro Santos",
-                "nmec": 90329,
-                "course": "Computadores e Telemática"
-            },
-            {
-                "name": "Rui Costa",
-                "nmec": 90330,
-                "course": "Eletrónica e Telecomunicações"
-            }
-        ]
-    },
-    {
-        "team": "Dolphins",
-        "phone": 912345678,
-        "members": [
-            {
-                "name": "Joana Silva",
-                "nmec": 90331,
-                "course": "Computadores e Telemática"
+                "name": "Mariana Bairos",
+                "nmec": 123456,
+                "course": ""
             },
             {
                 "name": "Ana Costa",
-                "nmec": 90332,
-                "course": "Computadores e Telemática"
+                "nmec": 123456,
+                "course": ""
             },
             {
-                "name": "Sara Santos",
-                "nmec": 90333,
-                "course": "Computadores e Telemática"
+                "name": "Eduardo Simões",
+                "nmec": 123456,
+                "course": ""
             },
             {
-                "name": "Marta Costa",
-                "nmec": 90334,
-                "course": "Eletrónica e Telecomunicações"
+                "name": "Sabrina Jorge",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Gonçalo Gafanha",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "5 é par",
+        "phone": 962322408,
+        "members": [
+            {
+                "name": "Leonor Rocha",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Leonor Abenta",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Ana Matos",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Joana Rodrigues",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Vitoria Correia",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "Jeito dela",
+        "phone": 935560474,
+        "members": [
+            {
+                "name": "Pedro Gil",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "António Oliveira",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Francisco Cordeiro",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Bruno Guimarães",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Rafael Oliveira",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "Bons PACaralho",
+        "phone": 919011073,
+        "members": [
+            {
+                "name": "Rui Soares",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "João Rocha",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Madalena Nabais",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Carlos Azevedo",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "João Mendonça",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "Seca Severa",
+        "phone": 912360778,
+        "members": [
+            {
+                "name": "Lúcia Sousa",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "João Gameiro",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Pedro Pereira",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Rita Figueiredo",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Diogo Ferro",
+                "nmec": 123456,
+                "course": ""
+            }
+        ]
+    }, {
+        "team": "Scooby Snacks",
+        "phone": 939684951,
+        "members": [
+            {
+                "name": "Mariana Garcia",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Sara Campos",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Marta Sá",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "Simão Machado",
+                "nmec": 123456,
+                "course": ""
+            },
+            {
+                "name": "João Santos",
+                "nmec": 123456,
+                "course": ""
             }
         ]
     }

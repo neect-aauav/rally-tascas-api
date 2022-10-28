@@ -292,56 +292,45 @@ def members(request, id=None):
             data = json.loads(request.body)
             try:
                 try:
-                    Members.objects.get(nmec=data["nmec"])
-
-                    # if already exists, break
+                    team = Teams.objects.get(id=float(data['team']))
+                except ValueError as e:
                     response = {
                         "status": status.HTTP_400_BAD_REQUEST,
-                        "message": f"A member with the nmec {data['nmec']} already exists"
+                        "message": "Team id must be a number"
                     }
-                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
+                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
                     return Response(response, status=response["status"])
-                except Members.DoesNotExist:
-                    try:
-                        team = Teams.objects.get(id=float(data['team']))
-                    except ValueError as e:
-                        response = {
-                            "status": status.HTTP_400_BAD_REQUEST,
-                            "message": "Team id must be a number"
-                        }
-                        logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
-                        return Response(response, status=response["status"])
 
-                    member = Members(name=data['name'], nmec=data['nmec'], course=data['course'], team=team)
+                member = Members(name=data['name'], nmec=data['nmec'], course=data['course'], team=team)
 
-                    try:
-                        member.save()
+                try:
+                    member.save()
 
-                        # create assoc member <-> bars
-                        all_bars = Bars.objects.all()
-                        for bar in all_bars:
-                            # check if the assoc already exists
-                            try:
-                                MembersBars.objects.get(barId=bar, memberId=member)
-                            except MembersBars.DoesNotExist:
-                                member_bars_assoc = MembersBars(barId=bar, memberId=member)                        
-                                member_bars_assoc.save()
+                    # create assoc member <-> bars
+                    all_bars = Bars.objects.all()
+                    for bar in all_bars:
+                        # check if the assoc already exists
+                        try:
+                            MembersBars.objects.get(barId=bar, memberId=member)
+                        except MembersBars.DoesNotExist:
+                            member_bars_assoc = MembersBars(barId=bar, memberId=member)                        
+                            member_bars_assoc.save()
 
-                        response = {
-                            "status": status.HTTP_200_OK,
-                            "message": f"Added member {data['name']} successfully to team {team.id}"
-                        }
-                        logger.info(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
-                        return Response(response, status=response["status"])
-                    except Exception as e:
-                        member.delete()
+                    response = {
+                        "status": status.HTTP_200_OK,
+                        "message": f"Added member {data['name']} successfully to team {team.id}"
+                    }
+                    logger.info(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
+                    return Response(response, status=response["status"])
+                except Exception as e:
+                    member.delete()
 
-                        response = {
-                            "status": status.HTTP_400_BAD_REQUEST,
-                            "message": f"Error adding member {data['name']}"
-                        }
-                        logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
-                        return Response(response, status=response["status"])
+                    response = {
+                        "status": status.HTTP_400_BAD_REQUEST,
+                        "message": f"Error adding member {data['name']}"
+                    }
+                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
+                    return Response(response, status=response["status"])
             except KeyError as e:
                 response = {
                     "status": status.HTTP_400_BAD_REQUEST,

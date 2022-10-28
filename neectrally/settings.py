@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 import os
 from pathlib import Path
-from neectrally.secrets import DB_NAME, DB_PWD, DB_USER, DB_HOST
 
 import pymysql
 
