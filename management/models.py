@@ -32,6 +32,7 @@ class AccountManager(BaseUserManager):
 
 		# save superuser token to secrets.py file
 		token = Token.objects.get(user=user).key
+		print(f"{BASE_DIR}/neectrally/secrets.py")
 		with open(f"{BASE_DIR}/neectrally/secrets.py", "a") as f:
 			f.write(f"\n\n#superuser token\nSUPER_USER_TOKEN = '{token}'\n")
 
