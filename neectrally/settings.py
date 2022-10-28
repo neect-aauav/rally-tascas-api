@@ -18,7 +18,7 @@ import pymysql
 pymysql.install_as_MySQLdb()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR =  os.environ.get('PROD_BASE_DIR') if os.environ.get('PROD_BASE_DIR') else Path(__file__).resolve().parent.parent
+BASE_DIR =  os.environ.get('PROD_BASE_DIR') if Path(os.environ.get('PROD_BASE_DIR')).as_posix() else Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -155,7 +155,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 # The absolute path to the directory where collectstatic will collect static files for deployment.
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = BASE_DIR  / 'staticfiles'
 
 STATIC_URL = 'static/'
 
