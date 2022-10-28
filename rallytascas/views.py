@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 
 from django.forms.models import model_to_dict
 
+from neectrally.settings import BASE_IRI
 from api.models import MembersBars, Teams, Members, Bars, Games
 from management import logger
 
@@ -43,7 +44,7 @@ def teamplay(request):
                     }
 
                     # update team
-                    requests.patch(f"http://localhost:8000/api/teams/{data['team_id']}", json={
+                    requests.patch(f"{BASE_IRI}/api/teams/{data['team_id']}", json={
                         "points": team.points + data["points"],
                         "drinks": team.drinks + data["drinks"],
                         "has_egg": data["has_egg"],
@@ -62,7 +63,7 @@ def teamplay(request):
                         for member in data["members"]:
                             member_object = Members.objects.get(id=member["id"])
                             # update members
-                            requests.patch(f"http://localhost:8000/api/members/{member['id']}", json={
+                            requests.patch(f"{BASE_IRI}/api/members/{member['id']}", json={
                                 "points": member_object.points + member["points"],
                                 "drinks": member_object.drinks + member["drinks"],
                                 "bar": {
@@ -80,14 +81,14 @@ def teamplay(request):
                         return Response(response, status=response["status"])
 
                     # update bars
-                    requests.patch(f"http://localhost:8000/api/bars/{data['bar_id']}", json={
+                    requests.patch(f"{BASE_IRI}/api/bars/{data['bar_id']}", json={
                         "points": bar.points + data["points"],
                         "drinks": bar.drinks + data["drinks"],
                         "puked": bar.puked + data["puked"],
                     }, headers=headers)
 
                     # update games
-                    requests.patch(f"http://localhost:8000/api/games/{game.id}", json={
+                    requests.patch(f"{BASE_IRI}/api/games/{game.id}", json={
                         "completed": game.completed + 1 if data["game_completed"] else 0
                     }, headers=headers)
 
@@ -150,16 +151,18 @@ def scoreboard_teams(request):
             teams = Teams.objects.all().order_by('-points')
             
             # iterate all teams
-            scoreboard = [[team.name, team.points, team.drinks] for team in teams]
+            scoreboard = [[team.name, team.points, team.drinks, team.has_egg, team.puked, len(Members.objects.filter(team=team))] for team in teams]
 
-            logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.method} {request.path}": Teams scoreboard successfully retrieved')
+            if request.auth and request.auth.key:
+                logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.method} {request.path}": Teams scoreboard successfully retrieved')
             return Response(scoreboard, status=status.HTTP_200_OK)
         except Teams.DoesNotExist as e:
             response = {
                 "status": status.HTTP_400_BAD_REQUEST,
                 "message": "There are no teams"
             }
-            logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
+            if request.auth and request.auth.key:
+                logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
             return Response(response, status=response["status"])
 
 
@@ -185,7 +188,7 @@ def scoreboard_members(request, team=None):
             elif team == "all":
                 members = Members.objects.all().order_by('-points')
 
-                all_teams = Teams.objects.all()
+                all_teams = Teams.objects.all().order_by('-points')
                 for team in all_teams:
                     members_score = []
                     members_team = members.filter(team=team.id)

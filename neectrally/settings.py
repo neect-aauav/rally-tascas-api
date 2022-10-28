@@ -24,6 +24,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
+# import heroku conf variables
+FRONTEND_URL = os.environ.get('FRONTEND_URL') if os.environ.get('FRONTEND_URL') else 'http://localhost:3000'
+BASE_IRI = os.environ.get('BASE_IRI') if os.environ.get('BASE_IRI') else 'http://localhost:8000'
+
+# force https
+if os.environ.get('FORCE_HTTPS') == 'True':
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-@v(7_4e%)t16ujri3zo_))7pw_f7lx9+vd8*ej0&bj6%d%a7h7'
 
@@ -77,8 +86,12 @@ MIDDLEWARE = [
 
 CORS_ORIGIN_ALLOW_ALL = True
 
+CORS_ORIGIN_WHITELIST = [
+     'http://localhost:3000', 'https://rally-tascas.herokuapp.com', 'http://rally-tascas.herokuapp.com'
+]
+
 # enable CORS for preflight operations
-CORS_ALLOW_HEADERS = ('Authorization', 'Content-Type', 'Cache-Control', 'X-Requested-With')
+#CORS_ALLOW_HEADERS = ('Authorization', 'Content-Type', 'Cache-Control', 'X-Requested-With')
 
 ROOT_URLCONF = 'neectrally.urls'
 

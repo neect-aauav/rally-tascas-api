@@ -900,7 +900,8 @@ Get an assembled scoreboard with teams and members.
 ### Get Teams Scoreboard
 
 Get a scoreboard with all teams sorted by points.
-The response is an array where the first element is the team name, the second element is the team points and the third element is the team drinks.
+The response is an array where the elements are distributed as follows:
+[***name***, ***points***, ***drinks***, ***has_egg***, ***puked***, ***members***]
 
 **HTTP Request**
 
@@ -912,7 +913,10 @@ The response is an array where the first element is the team name, the second el
     [
         "Team 1",
         10,
-        2
+        2,
+        true,
+        5,
+        4
     ],
     ...
 ]
@@ -923,7 +927,8 @@ The response is an array where the first element is the team name, the second el
 Get a scoreboard with all members.
 If a team ID is provided in the path, the scoreboard will only contain members of that team.
 To get all scores from all teams, put /all in the url path.
-The response is an array where the first element is the member name, the last element is the total number of points of that member and the elements in between are the points made in each bar.
+The response is an array where the members are distributed as follows:
+[***name***, ...***bar_points***, ***total_points***]
 
 **HTTP Request**
 

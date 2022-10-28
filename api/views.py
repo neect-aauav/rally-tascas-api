@@ -11,7 +11,7 @@ from django.forms.models import model_to_dict
 from qrcode.image.styledpil import StyledPilImage
 from qrcode.image.styles.colormasks import *
 
-from neectrally.settings import BASE_DIR
+from neectrally.settings import BASE_DIR, BASE_IRI, FRONTEND_URL
 from management import logger
 
 import json
@@ -51,7 +51,7 @@ def teams(request, id=None):
                             # loop through members
                             for member in data['members']:
                                 member["team"] = team.id
-                                requests.post(f'http://{request.get_host()}/api/members', json=member, headers=headers)
+                                requests.post(f'{BASE_IRI}/api/members', json=member, headers=headers)
 
                             # create assoc team <-> bars
                             all_bars = Bars.objects.all()
@@ -66,9 +66,9 @@ def teams(request, id=None):
                             # qr code generation
                             qr_name = f'qrcodes/qr_team{team.id}.png'
                             path = f'{BASE_DIR}/static/{qr_name}'
-                            team.qr_code = f'http://{request.get_host()}/static/{qr_name}'
+                            team.qr_code = f'{BASE_IRI}/static/{qr_name}'
 
-                            _generate_qrcode(path, 'http://127.0.0.1:8000/api/docs/')
+                            _generate_qrcode(path, f'{FRONTEND_URL}/admin/equipas/{team.id}')
 
                             team.save()
                             
@@ -874,9 +874,9 @@ def qrcodes(request, id=None):
             if request.method == "POST":
                 qr_name = f'qrcodes/qr_team{id}.png'
                 path = f'{BASE_DIR}/static/{qr_name}'
-                team.qr_code = f'http://{request.get_host()}/static/{qr_name}'
+                team.qr_code = f'{BASE_IRI}/static/{qr_name}'
 
-                _generate_qrcode(path, 'http://127.0.0.1:8000/api/docs/')
+                _generate_qrcode(path, f'{FRONTEND_URL}/equipas/{id}')
 
                 team.save()
 
