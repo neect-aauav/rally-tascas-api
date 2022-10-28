@@ -4,9 +4,10 @@ import requests
 import sys
 import os
 sys.path.append('../')
-from neectrally.settings import BASE_IRI
 
-SUPER_USER_TOKEN = os.environ.get('PROD_BASE_DIR')
+from neectrally.settings import BASE_DIR, BASE_IRI
+
+SUPER_USER_TOKEN = os.environ.get('SUPER_USER_TOKEN')
 
 HEADERS = {
     'Content-Type': 'application/json',
@@ -18,7 +19,7 @@ TAGS = ['teams', 'games', 'bars', 'prizes']
 for tag in TAGS:
     # generate <tag> from <tag>.json
     print(f"Generating {tag}...")
-    with open(f'{tag}.json', 'r') as f:
+    with open(f'{BASE_DIR}/data/{tag}.json', 'r') as f:
         try:
             objects = json.load(f)
         except json.decoder.JSONDecodeError:
