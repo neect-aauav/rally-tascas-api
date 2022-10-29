@@ -1,18 +1,27 @@
 from datetime import datetime
+""" try:
+    from management.models import DBLogger
+except:
+    pass """
 
 class Logger:
 
     def __init__(self, path):
         self.path = path
 
-    def __write(self, file, prefix, message):
+    def __write(self, token, prefix, message):
+        # dump log to database model
+        """ log = DBLogger(user=token, time=prefix, message=message)
+        log.save() """
+
+        file = self.path + token + ".log"
         with open(file, 'a') as f:
             f.write(f"[{prefix}]: {message}\n")
 
     def __build(self, token, prefix, msg):
-        file = self.path + token + ".log"
+        token = self.path + token + ".log"
         prefix = f"{datetime.now().strftime('%Y/%m/%d %H:%M:%S')} - {prefix}"
-        self.__write(file, prefix, msg)
+        self.__write(token, prefix, msg)
 
     def info(self, token, msg):
         self.__build(token, "INFO", msg)
