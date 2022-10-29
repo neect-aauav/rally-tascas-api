@@ -36,9 +36,9 @@ class AccountManager(BaseUserManager):
 		return user
 
 class DBLogger(models.Model):
-	user = models.CharField(max_length=100)
 	time = models.CharField(max_length=60)
 	message = models.CharField(max_length=500)
+	user = models.CharField(max_length=100)
 
 class Account(AbstractBaseUser):
 
