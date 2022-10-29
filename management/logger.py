@@ -14,7 +14,10 @@ class Logger:
 
         # dump log to database model
         from management.models import DBLogger
-        log = DBLogger(user=token, type=prefix, time=time, status=status, message=splitted[1])
+        if len(splitted) > 1:
+            log = DBLogger(user=token, type=prefix, time=time, status=status, message=splitted[1])
+        else:
+            log = DBLogger(user=token, type=prefix, time=time, status="200", message=message)
         log.save()
 
         file = self.path + token + ".log"
