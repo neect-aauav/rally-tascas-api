@@ -1,8 +1,5 @@
 from datetime import datetime
-""" try:
-    from management.models import DBLogger
-except:
-    pass """
+
 
 class Logger:
 
@@ -11,15 +8,16 @@ class Logger:
 
     def __write(self, token, prefix, message):
         # dump log to database model
-        """ log = DBLogger(user=token, time=prefix, message=message)
-        log.save() """
+        from management.models import DBLogger
+        log = DBLogger(user=token, time=prefix, message=message)
+        log.save()
 
         file = self.path + token + ".log"
         with open(file, 'a') as f:
             f.write(f"[{prefix}]: {message}\n")
 
     def __build(self, token, prefix, msg):
-        token = self.path + token + ".log"
+        token = token
         prefix = f"{datetime.now().strftime('%Y/%m/%d %H:%M:%S')} - {prefix}"
         self.__write(token, prefix, msg)
 
