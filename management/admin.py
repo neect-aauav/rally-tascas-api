@@ -5,7 +5,7 @@ from api.models import Members, Teams
 from .models import Account, DBLogger
 
 class AccountAdmin(UserAdmin):
-    list_display = ('name', 'nmec', 'username', 'date_joined', 'last_login', 'is_superuser', 'is_admin', 'is_staff', 'is_active')
+    list_display = ('name', 'nmec', 'username', 'bar', 'date_joined', 'last_login', 'is_superuser', 'is_admin', 'is_staff', 'is_active')
     readonly_fields = ('id', 'date_joined', 'last_login')
 
     filter_horizontal = ()
@@ -13,16 +13,16 @@ class AccountAdmin(UserAdmin):
     fieldsets = ()
 
 class DBLoggerAdmin(admin.ModelAdmin):
-    list_display = ('user', 'time', 'message')
-    readonly_fields = ('user', 'time', 'message')
-    search_fields = ['user']
+    list_display = ('user', 'time', 'type', 'status', 'message')
+    readonly_fields = ('user', 'time', 'type', 'status', 'message')
+    search_fields = ['user', 'type', 'status']
 
     filter_horizontal = ()
     list_filter = ()
     fieldsets = ()
 
 class TeamsAdmin(admin.ModelAdmin):
-    list_display = ('name','points', 'drinks', 'has_egg', 'puked')
+    list_display = ('name','points', 'drinks', 'has_egg', 'puked', 'phone')
     readonly_fields = ('qr_code', 'created')
     search_fields = ['name']
 
@@ -31,7 +31,7 @@ class TeamsAdmin(admin.ModelAdmin):
     fieldsets = ()
 
 class MembersAdmin(admin.ModelAdmin):
-    list_display = ('name', 'points', 'drinks')
+    list_display = ('name', 'points', 'drinks', 'team')
     search_fields = ['name']
     readonly_fields = ()
 

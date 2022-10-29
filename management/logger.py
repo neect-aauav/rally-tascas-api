@@ -7,18 +7,22 @@ class Logger:
         self.path = path
 
     def __write(self, token, prefix, message):
+        time = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
+
+        splitted = message.split("]@")
+        status = message.split("]@")[0][1:]
+
         # dump log to database model
         from management.models import DBLogger
-        log = DBLogger(user=token, time=prefix, message=message)
+        log = DBLogger(user=token, type=prefix, time=time, status=status, message=splitted[1])
         log.save()
 
         file = self.path + token + ".log"
         with open(file, 'a') as f:
-            f.write(f"[{prefix}]: {message}\n")
+            f.write(f"[{time} - {prefix}]: {message}\n")
 
     def __build(self, token, prefix, msg):
         token = token
-        prefix = f"{datetime.now().strftime('%Y/%m/%d %H:%M:%S')} - {prefix}"
         self.__write(token, prefix, msg)
 
     def info(self, token, msg):

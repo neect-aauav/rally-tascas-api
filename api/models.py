@@ -10,6 +10,10 @@ class Teams(models.Model):
 	has_egg = models.BooleanField(default=True)
 	puked = models.IntegerField(default=0)
 
+	def __str__(self):
+		return str(self.name)
+
+
 class Members(models.Model):
 	name = models.CharField(max_length=255)
 	course = models.CharField(max_length=255)
@@ -34,6 +38,9 @@ class Bars(models.Model):
 	drinks = models.IntegerField(default=0)
 	puked = models.IntegerField(default=0)
 	game = models.ForeignKey(Games, on_delete=(models.CASCADE), default=None, blank=True, null=True)
+
+	def __str__(self):
+		return str(self.name)
 
 class TeamsBars(models.Model):
 	teamId = models.ForeignKey(Teams, on_delete=models.CASCADE)

@@ -1,3 +1,4 @@
+from pyexpat import model
 from django.db import models
 from django.conf import settings
 from django.db.models.signals import post_save
@@ -37,6 +38,8 @@ class AccountManager(BaseUserManager):
 
 class DBLogger(models.Model):
 	time = models.CharField(max_length=60)
+	type = models.CharField(max_length=60)
+	status = models.CharField(max_length=60)
 	message = models.CharField(max_length=500)
 	user = models.CharField(max_length=100)
 
