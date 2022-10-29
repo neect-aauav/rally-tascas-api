@@ -19,3 +19,4 @@ media
 # static #
 static/qrcodes/*.png
 static/logs/*.log
+data/qrcodes/*.png
