@@ -140,9 +140,6 @@ def teams(request, id=None):
 
                 teams = [_get_team(team_object) for team_object in team_objects]
 
-                if request.auth and request.auth.key:
-                    team_names = ", ".join([f'"{team["name"]}"' for team in teams])
-                    logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.method} {request.path}": Got teams {team_names} successfully')
                 return Response(teams[0] if len(teams) == 1 else teams, status=status.HTTP_200_OK)
             except Teams.DoesNotExist as e:
                 response = {
@@ -377,10 +374,6 @@ def members(request, id=None):
 
                 members = [_get_member(member) for member in member_objects]
 
-                if request.auth and request.auth.key:
-                    member_names = ", ".join([f'"{member["name"]}"' for member in members])
-                    logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.method} {request.path}": Got teams {member_names} successfully')
-
                 return Response(members[0] if len(members) == 1 else members, status=status.HTTP_200_OK)
             except Teams.DoesNotExist as e:
                 response = {
@@ -602,8 +595,6 @@ def bars(request, id=None):
                 if bar_object.game is not None:
                     bar["game"] = model_to_dict(bar_object.game)
 
-                if request.auth and request.auth.key:
-                    logger.info(request.auth.key, f'[{status.HTTP_200_OK}][@{request.path}]: Got bar {bar["name"]} successfully')
                 return Response(bar, status=status.HTTP_200_OK) 
             except Bars.DoesNotExist as e:
                 response = {
@@ -632,9 +623,6 @@ def bars(request, id=None):
                     
                     bars.append(bar)
 
-                if request.auth and request.auth.key:
-                    bar_names = ", ".join([f'"{bar["name"]}"' for bar in bars])
-                    logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.method} {request.path}": Got bars {bar_names} successfully')
                 return Response(bars[0] if len(bars) == 1 else bars, status=status.HTTP_200_OK)
             except Bars.DoesNotExist as e:
                 response = {
@@ -878,8 +866,6 @@ def qrcodes(request, id=None):
 
             # get qrcode path
             if request.method == "GET":
-                if request.auth and request.auth.key:
-                    logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.method} {request.path}": Viewed QR code of team {team.name}')
                 return redirect(f'/static/qrcodes/qr_team{team.id}.png')
 
             if request.method == "DELETE":
@@ -967,8 +953,6 @@ def games(request, id=None):
                 game_object = Games.objects.get(id=id)
                 game = model_to_dict(game_object)
 
-                if request.auth and request.auth.key:
-                    logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.method} {request.path}": Got game {game["name"]} sucessfully')
                 return Response(game, status=status.HTTP_200_OK) 
             except Games.DoesNotExist as e:
                 response = {
@@ -995,9 +979,6 @@ def games(request, id=None):
                     game = model_to_dict(game_object)
                     games.append(game)
 
-                if request.auth and request.auth.key:
-                    game_names = ", ".join([f'"{game["name"]}"' for game in games])
-                    logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.method} {request.path}": Got games {game_names} successfully')
                 return Response(games[0] if len(games) == 1 else games, status=status.HTTP_200_OK)
             except Games.DoesNotExist as e:
                 response = {
@@ -1154,8 +1135,6 @@ def prizes(request, id=None):
                 if prize_object.winner is not None:
                     prize["winner"] = model_to_dict(prize_object.winner)
 
-                if request.auth and request.auth.key:
-                    logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.method} {request.path}": Got prize {prize["name"]} successfully')
                 return Response(prize, status=status.HTTP_200_OK) 
             except Prizes.DoesNotExist as e:
                 response = {
@@ -1190,9 +1169,6 @@ def prizes(request, id=None):
                     
                     prizes.append(prize)
 
-                if request.auth and request.auth.key:
-                    prize_names = ", ".join([f'"{prize["name"]}"' for prize in prizes])
-                    logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.method} {request.path}": Got prizes {prize_names} successfully')
                 return Response(prizes[0] if len(prizes) == 1 else prizes, status=status.HTTP_200_OK)
             except Prizes.DoesNotExist as e:
                 response = {
