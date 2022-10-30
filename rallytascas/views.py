@@ -1,4 +1,5 @@
 import json
+import pprint
 import requests
 
 from django.views.decorators.csrf import csrf_exempt
@@ -24,6 +25,8 @@ def teamplay(request):
                 team = Teams.objects.get(id=data["team_id"])
                 bar = Bars.objects.get(id=data["bar_id"])
                 game = Games.objects.get(id=bar.game.id)
+
+                total_points = data["points"]
 
                 if len(data["members"]) > 0:
                     
@@ -94,7 +97,7 @@ def teamplay(request):
 
                     response = {
                         "status": status.HTTP_200_OK,
-                        "message": f"Teamplay successfully saved"
+                        "message": f"Teamplay successfully saved! Team: {team.name}, Bar: {bar.name}, Points: {total_points}"
                     }
                     logger.info(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
                     return Response(response, status=response["status"])
@@ -151,11 +154,17 @@ def scoreboard_teams(request):
             teams = Teams.objects.all().order_by('-points')
             
             # iterate all teams
-            scoreboard = [[team.name, team.points, team.drinks, team.has_egg, team.puked, len(Members.objects.filter(team=team))] for team in teams]
+            response = {
+                "scoreboard": [[team.name, team.points, team.drinks, team.has_egg, team.puked, len(Members.objects.filter(team=team))] for team in teams],
+                "special-prizes": [{
+                    "name": team.name,
+                    "best_name": team.best_name,
+                    "best_team_costume": team.best_team_costume,
+                    "won_special_game": team.won_special_game
+                } for team in teams]
+            }
 
-            if request.auth and request.auth.key:
-                logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.method} {request.path}": Teams scoreboard successfully retrieved')
-            return Response(scoreboard, status=status.HTTP_200_OK)
+            return Response(response, status=status.HTTP_200_OK)
         except Teams.DoesNotExist as e:
             response = {
                 "status": status.HTTP_400_BAD_REQUEST,
@@ -219,8 +228,6 @@ def scoreboard_members(request, team=None):
 
                     scoreboard.append(member_score)
 
-            if request.auth and request.auth.key:
-                logger.info(request.auth.key, f'[{status.HTTP_200_OK}]@"{request.method} {request.path}": Members scoreboard successfully retrieved')
             return Response(scoreboard, status=status.HTTP_200_OK)
         except Members.DoesNotExist as e:
             response = {

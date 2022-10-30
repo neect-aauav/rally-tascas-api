@@ -36,7 +36,7 @@ if os.environ.get('FORCE_HTTPS') == 'True':
 SECRET_KEY = 'django-insecure-@v(7_4e%)t16ujri3zo_))7pw_f7lx9+vd8*ej0&bj6%d%a7h7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True 
 
 ALLOWED_HOSTS = ['*']
 

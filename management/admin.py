@@ -22,7 +22,7 @@ class DBLoggerAdmin(admin.ModelAdmin):
     fieldsets = ()
 
 class TeamsAdmin(admin.ModelAdmin):
-    list_display = ('name','points', 'drinks', 'has_egg', 'puked', 'phone')
+    list_display = ('name','points', 'drinks', 'has_egg', 'puked', 'phone', 'best_name', 'best_team_costume', 'won_special_game')
     readonly_fields = ('qr_code', 'created')
     search_fields = ['name']
 

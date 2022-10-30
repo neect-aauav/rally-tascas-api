@@ -187,7 +187,7 @@ def teams(request, id=None):
             if id is not None:
                 try:
                     team = Teams.objects.get(id=id)
-                    modifiable_fields = ["name", "phone", "points", "drinks", "has_egg", "puked"]
+                    modifiable_fields = ["name", "phone", "points", "drinks", "has_egg", "puked", "best_name", "best_team_costume", "won_special_game"]
                     for field in modifiable_fields:
                         if field in data:
                             # if field is name, check if it already exists

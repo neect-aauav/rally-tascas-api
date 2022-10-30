@@ -10,6 +10,11 @@ class Teams(models.Model):
 	has_egg = models.BooleanField(default=True)
 	puked = models.IntegerField(default=0)
 
+	# final prizes
+	best_name = models.BooleanField(default=False)
+	best_team_costume = models.BooleanField(default=False)
+	won_special_game = models.BooleanField(default=False)
+
 	def __str__(self):
 		return str(self.name)
 
