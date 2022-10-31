@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from api.models import MembersBars, Teams, Members, Bars, TeamsBars, Games, Prizes
 from django.forms.models import model_to_dict
+from django.db import transaction
 
 from qrcode.image.styledpil import StyledPilImage
 from qrcode.image.styles.colormasks import *
@@ -186,54 +187,55 @@ def teams(request, id=None):
             data = json.loads(request.body)
             if id is not None:
                 try:
-                    team = Teams.objects.select_for_update().get(id=id)
-                    modifiable_fields = ["name", "phone", "points", "drinks", "has_egg", "puked", "best_name", "best_team_costume", "won_special_game"]
-                    for field in modifiable_fields:
-                        if field in data:
-                            # if field is name, check if it already exists
-                            if field == "name":
-                                try:
-                                    Teams.objects.get(name=data[field])
-                                    response = {
-                                        "status": status.HTTP_400_BAD_REQUEST,
-                                        "message": f"A team with the name {data[field]} already exists"
-                                    }
-                                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
-                                    return Response(response, status=response["status"])
-                                except Teams.DoesNotExist:
-                                    pass
-                                
-                            setattr(team, field, data[field])
+                    with transaction.atomic():
+                        team = Teams.objects.select_for_update().get(id=id)
+                        modifiable_fields = ["name", "phone", "points", "drinks", "has_egg", "puked", "best_name", "best_team_costume", "won_special_game"]
+                        for field in modifiable_fields:
+                            if field in data:
+                                # if field is name, check if it already exists
+                                if field == "name":
+                                    try:
+                                        Teams.objects.get(name=data[field])
+                                        response = {
+                                            "status": status.HTTP_400_BAD_REQUEST,
+                                            "message": f"A team with the name {data[field]} already exists"
+                                        }
+                                        logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
+                                        return Response(response, status=response["status"])
+                                    except Teams.DoesNotExist:
+                                        pass
+                                    
+                                setattr(team, field, data[field])
 
-                    # update team bar association if given
-                    if "bar" in data:
-                        try:
-                            bar_data = data["bar"]
-                            bar = Bars.objects.get(id=bar_data["id"])
+                        # update team bar association if given
+                        if "bar" in data:
+                            try:
+                                bar_data = data["bar"]
+                                bar = Bars.objects.get(id=bar_data["id"])
 
-                            team_bars_assoc = TeamsBars.objects.get(teamId=team.id, barId=bar_data["id"])
-                            team_bars_assoc.visited = True
-                            team_bars_assoc.points += bar_data["points"]
-                            team_bars_assoc.drinks += bar_data["drinks"]
-                            team_bars_assoc.has_egg = bar_data["has_egg"]
-                            team_bars_assoc.puked = bar_data["puked"]
-                            team_bars_assoc.won_game = bar_data["won_game"]
-                            team_bars_assoc.save()
-                        except Bars.DoesNotExist as e:
-                            response = {
-                                "status": status.HTTP_400_BAD_REQUEST,
-                                "message": f"There is no bar with the id {data['bar']}"
-                            }
-                            logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
-                            return Response(response, status=response["status"])
+                                team_bars_assoc = TeamsBars.objects.get(teamId=team.id, barId=bar_data["id"])
+                                team_bars_assoc.visited = True
+                                team_bars_assoc.points += bar_data["points"]
+                                team_bars_assoc.drinks += bar_data["drinks"]
+                                team_bars_assoc.has_egg = bar_data["has_egg"]
+                                team_bars_assoc.puked = bar_data["puked"]
+                                team_bars_assoc.won_game = bar_data["won_game"]
+                                team_bars_assoc.save()
+                            except Bars.DoesNotExist as e:
+                                response = {
+                                    "status": status.HTTP_400_BAD_REQUEST,
+                                    "message": f"There is no bar with the id {data['bar']}"
+                                }
+                                logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
+                                return Response(response, status=response["status"])
 
-                    team.save()
-                    response = {
-                        "status": status.HTTP_200_OK,
-                        "message": f"Updated team {team.name} successfully"
-                    }
-                    logger.info(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
-                    return Response(response, status=response["status"])
+                        team.save()
+                        response = {
+                            "status": status.HTTP_200_OK,
+                            "message": f"Updated team {team.name} successfully"
+                        }
+                        logger.info(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
+                        return Response(response, status=response["status"])
                 except Teams.DoesNotExist as e:
                     response = {
                         "status": status.HTTP_400_BAD_REQUEST,
@@ -416,51 +418,53 @@ def members(request, id=None):
             data = json.loads(request.body)
             if id is not None:
                 try:
-                    member = Members.objects.select_for_update().get(id=id)
-                    modifiable_fields = ["name", "nmec", "course", "team", "points", "drinks"]
-                    for field in modifiable_fields:
-                        if field in data:
-                            # if field is nmec, check if it already exists
-                            if field == "nmec":
-                                try:
-                                    Members.objects.get(nmec=data[field])
-                                    response = {
-                                        "status": status.HTTP_400_BAD_REQUEST,
-                                        "message": f"Member with nmec {data[field]} already exists"
-                                    }
-                                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
-                                    return Response(response, status=response["status"])
-                                except Members.DoesNotExist:
-                                    pass
-                                
-                            setattr(member, field, data[field])
+                    with transaction.atomic():
+                        member = Members.objects.select_for_update().get(id=id)
+                        modifiable_fields = ["name", "nmec", "course", "team", "points", "drinks"]
+                        for field in modifiable_fields:
+                            if field in data:
+                                # if field is nmec, check if it already exists
+                                if field == "nmec":
+                                    try:
+                                        Members.objects.get(nmec=data[field])
+                                        response = {
+                                            "status": status.HTTP_400_BAD_REQUEST,
+                                            "message": f"Member with nmec {data[field]} already exists"
+                                        }
+                                        logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
+                                        return Response(response, status=response["status"])
+                                    except Members.DoesNotExist:
+                                        pass
+                                    
+                                setattr(member, field, data[field])
 
-                    # update members bar association if given
-                    if "bar" in data:
-                        try:
-                            bar_data = data["bar"]
-                            bar = Bars.objects.get(id=bar_data["id"])
+                        # update members bar association if given
+                        if "bar" in data:
+                            try:
+                                bar_data = data["bar"]
+                                bar = Bars.objects.get(id=bar_data["id"])
 
-                            member_bars_assoc = MembersBars.objects.select_for_update().get(memberId=member.id, barId=bar_data["id"])
-                            member_bars_assoc.points += bar_data["points"]
-                            member_bars_assoc.drinks += bar_data["drinks"]
-                            member_bars_assoc.save()
-                        except Bars.DoesNotExist as e:
-                            response = {
-                                "status": status.HTTP_400_BAD_REQUEST,
-                                "message": f"There is no bar with the id {data['bar']}"
-                            }
-                            logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
-                            return Response(response, status=response["status"])
+                                with transaction.atomic():
+                                    member_bars_assoc = MembersBars.objects.select_for_update().get(memberId=member.id, barId=bar_data["id"])
+                                    member_bars_assoc.points += bar_data["points"]
+                                    member_bars_assoc.drinks += bar_data["drinks"]
+                                    member_bars_assoc.save()
+                            except Bars.DoesNotExist as e:
+                                response = {
+                                    "status": status.HTTP_400_BAD_REQUEST,
+                                    "message": f"There is no bar with the id {data['bar']}"
+                                }
+                                logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
+                                return Response(response, status=response["status"])
 
-                    member.save()
+                        member.save()
 
-                    response = {
-                        "status": status.HTTP_200_OK,
-                        "message": f"Updated member {member.name} successfully with nmec {member.nmec}"
-                    }
-                    logger.info(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
-                    return Response(response, status=response["status"])
+                        response = {
+                            "status": status.HTTP_200_OK,
+                            "message": f"Updated member {member.name} successfully with nmec {member.nmec}"
+                        }
+                        logger.info(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
+                        return Response(response, status=response["status"])
                 except Teams.DoesNotExist as e:
                     response = {
                         "status": status.HTTP_400_BAD_REQUEST,
@@ -665,41 +669,42 @@ def bars(request, id=None):
             data = json.loads(request.body)
             if id is not None:
                 try:
-                    bar = Bars.objects.select_for_update().get(id=id)
-                    modifiable_fields = ["name", "address", "latitude", "longitude", "picture", "points", "drinks", "puked", "game"]
-                    for field in modifiable_fields:
-                        if field in data:
-                            # if field is name, check if it already exists
-                            if field == "name":
-                                try:
-                                    Bars.objects.get(name=data[field])
+                    with transaction.atomic():
+                        bar = Bars.objects.select_for_update().get(id=id)
+                        modifiable_fields = ["name", "address", "latitude", "longitude", "picture", "points", "drinks", "puked", "game"]
+                        for field in modifiable_fields:
+                            if field in data:
+                                # if field is name, check if it already exists
+                                if field == "name":
+                                    try:
+                                        Bars.objects.get(name=data[field])
 
-                                    response = {
-                                        "status": status.HTTP_400_BAD_REQUEST,
-                                        "message": f"There is already a bar with the name {data[field]}"
-                                    }
-                                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
-                                    return Response(response, status=response["status"])
-                                except Members.DoesNotExist:
-                                    pass
+                                        response = {
+                                            "status": status.HTTP_400_BAD_REQUEST,
+                                            "message": f"There is already a bar with the name {data[field]}"
+                                        }
+                                        logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
+                                        return Response(response, status=response["status"])
+                                    except Members.DoesNotExist:
+                                        pass
 
-                            # if field is game, check if it exists
-                            if field == "game":
-                                try:
-                                    game = Games.objects.get(id=data[field])
-                                    setattr(bar, field, game)
-                                    continue
-                                except Games.DoesNotExist as e:
-                                    response = {
-                                        "status": status.HTTP_400_BAD_REQUEST,
-                                        "message": f"There is no game with the id {data[field]}"
-                                    }
-                                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
-                                    return Response(response, status=response["status"])
-                                
-                            setattr(bar, field, data[field])
+                                # if field is game, check if it exists
+                                if field == "game":
+                                    try:
+                                        game = Games.objects.get(id=data[field])
+                                        setattr(bar, field, game)
+                                        continue
+                                    except Games.DoesNotExist as e:
+                                        response = {
+                                            "status": status.HTTP_400_BAD_REQUEST,
+                                            "message": f"There is no game with the id {data[field]}"
+                                        }
+                                        logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
+                                        return Response(response, status=response["status"])
+                                    
+                                setattr(bar, field, data[field])
 
-                    bar.save()
+                        bar.save()
 
                     response = {
                         "status": status.HTTP_200_OK,
@@ -1021,26 +1026,27 @@ def games(request, id=None):
             data = json.loads(request.body)
             if id is not None:
                 try:
-                    game = Games.objects.select_for_update().get(id=id)
-                    modifiable_fields = ["name", "location", "points", "completed"]
-                    for field in modifiable_fields:
-                        if field in data:
-                            # if field is name, check if it already exists
-                            if field == "name":
-                                try:
-                                    Games.objects.get(name=data[field])
-                                    response = {
-                                        "status": status.HTTP_400_BAD_REQUEST,
-                                        "message": f"Game with name {data[field]} already exists"
-                                    }
-                                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
-                                    return Response(response, status=response["status"])
-                                except Games.DoesNotExist:
-                                    pass
-                                
-                            setattr(game, field, data[field])
+                    with transaction.atomic():
+                        game = Games.objects.select_for_update().get(id=id)
+                        modifiable_fields = ["name", "location", "points", "completed"]
+                        for field in modifiable_fields:
+                            if field in data:
+                                # if field is name, check if it already exists
+                                if field == "name":
+                                    try:
+                                        Games.objects.get(name=data[field])
+                                        response = {
+                                            "status": status.HTTP_400_BAD_REQUEST,
+                                            "message": f"Game with name {data[field]} already exists"
+                                        }
+                                        logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
+                                        return Response(response, status=response["status"])
+                                    except Games.DoesNotExist:
+                                        pass
+                                    
+                                setattr(game, field, data[field])
 
-                    game.save()
+                        game.save()
 
                     response = {
                         "status": status.HTTP_200_OK,
