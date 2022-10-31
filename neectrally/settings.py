@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+from datetime import timedelta
 import os
 from pathlib import Path
 
@@ -169,3 +170,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 import dj_database_url
 db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)
+
+CELERY_BROKER_URL="redis://"
+CELERY_ENABLE_UTC = False
+CELERY_TIMEZONE = 'Europe/Lisbon'
+CELERY_BEAT_SCHEDULE = {
+    'put_data': {
+        'task':'rallytascas.tasks.put_data',
+        'schedule':timedelta(milliseconds=5000)
+    }
+}

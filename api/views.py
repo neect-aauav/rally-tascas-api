@@ -186,7 +186,7 @@ def teams(request, id=None):
             data = json.loads(request.body)
             if id is not None:
                 try:
-                    team = Teams.objects.get(id=id)
+                    team = Teams.objects.select_for_update().get(id=id)
                     modifiable_fields = ["name", "phone", "points", "drinks", "has_egg", "puked", "best_name", "best_team_costume", "won_special_game"]
                     for field in modifiable_fields:
                         if field in data:
@@ -416,7 +416,7 @@ def members(request, id=None):
             data = json.loads(request.body)
             if id is not None:
                 try:
-                    member = Members.objects.get(id=id)
+                    member = Members.objects.select_for_update().get(id=id)
                     modifiable_fields = ["name", "nmec", "course", "team", "points", "drinks"]
                     for field in modifiable_fields:
                         if field in data:
@@ -441,7 +441,7 @@ def members(request, id=None):
                             bar_data = data["bar"]
                             bar = Bars.objects.get(id=bar_data["id"])
 
-                            member_bars_assoc = MembersBars.objects.get(memberId=member.id, barId=bar_data["id"])
+                            member_bars_assoc = MembersBars.objects.select_for_update().get(memberId=member.id, barId=bar_data["id"])
                             member_bars_assoc.points += bar_data["points"]
                             member_bars_assoc.drinks += bar_data["drinks"]
                             member_bars_assoc.save()
@@ -665,7 +665,7 @@ def bars(request, id=None):
             data = json.loads(request.body)
             if id is not None:
                 try:
-                    bar = Bars.objects.get(id=id)
+                    bar = Bars.objects.select_for_update().get(id=id)
                     modifiable_fields = ["name", "address", "latitude", "longitude", "picture", "points", "drinks", "puked", "game"]
                     for field in modifiable_fields:
                         if field in data:
@@ -1021,7 +1021,7 @@ def games(request, id=None):
             data = json.loads(request.body)
             if id is not None:
                 try:
-                    game = Games.objects.get(id=id)
+                    game = Games.objects.select_for_update().get(id=id)
                     modifiable_fields = ["name", "location", "points", "completed"]
                     for field in modifiable_fields:
                         if field in data:
