@@ -4,6 +4,7 @@ from celery.utils.log import get_task_logger
 from celery import shared_task
 
 from api.models import Teams, Members, Bars, Games
+from api.views import patch_team, patch_member, patch_bar, patch_game
 
 from neectrally.celery import app
 
@@ -13,15 +14,7 @@ logger.propagate = True
 from neectrally.settings import BASE_IRI
 
 @app.task
-def put_data(msg):
-    AUTH_KEY = msg['token']
-    data = msg['data']
-
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Token {AUTH_KEY}"
-    }
-
+def put_data(data):
     print("Making PATCH...")
 
     team = Teams.objects.get(id=data["team_id"])
@@ -29,7 +22,7 @@ def put_data(msg):
     game = Games.objects.get(id=bar.game.id)
     
     # update team
-    requests.patch(f"{BASE_IRI}/api/teams/{data['team_id']}", json={
+    patch_team({
         "points": team.points + data["points"],
         "drinks": team.drinks + data["drinks"],
         "has_egg": data["has_egg"],
@@ -42,12 +35,12 @@ def put_data(msg):
             "puked": data["puked"],
             "won_game": data["game_completed"]
         }
-    }, headers=headers)
+    }, team.id)
 
     for member in data["members"]:
         member_object = Members.objects.get(id=member["id"])
         # update members
-        requests.patch(f"{BASE_IRI}/api/members/{member['id']}", json={
+        patch_member({
             "points": member_object.points + member["points"],
             "drinks": member_object.drinks + member["drinks"],
             "bar": {
@@ -55,18 +48,18 @@ def put_data(msg):
                 "points": member["points"],
                 "drinks": member["drinks"]
             }
-        }, headers=headers)
+        }, member_object.id)
 
     # update bars
-    requests.patch(f"{BASE_IRI}/api/bars/{data['bar_id']}", json={
+    patch_bar({
         "points": bar.points + data["points"],
         "drinks": bar.drinks + data["drinks"],
         "puked": bar.puked + data["puked"],
-    }, headers=headers)
+    }, bar.id)
 
     # update games
-    requests.patch(f"{BASE_IRI}/api/games/{game.id}", json={
+    patch_game({
         "completed": game.completed + 1 if data["game_completed"] else 0
-    }, headers=headers)
+    }, game.id)
 
     return True

@@ -186,48 +186,7 @@ def teams(request, id=None):
             data = json.loads(request.body)
             if id is not None:
                 try:
-                    team = Teams.objects.get(id=id)
-                    modifiable_fields = ["name", "phone", "points", "drinks", "has_egg", "puked", "best_name", "best_team_costume", "won_special_game"]
-                    for field in modifiable_fields:
-                        if field in data:
-                            # if field is name, check if it already exists
-                            if field == "name":
-                                try:
-                                    Teams.objects.get(name=data[field])
-                                    response = {
-                                        "status": status.HTTP_400_BAD_REQUEST,
-                                        "message": f"A team with the name {data[field]} already exists"
-                                    }
-                                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
-                                    return Response(response, status=response["status"])
-                                except Teams.DoesNotExist:
-                                    pass
-                                
-                            setattr(team, field, data[field])
-
-                    # update team bar association if given
-                    if "bar" in data:
-                        try:
-                            bar_data = data["bar"]
-                            bar = Bars.objects.get(id=bar_data["id"])
-
-                            team_bars_assoc = TeamsBars.objects.get(teamId=team.id, barId=bar_data["id"])
-                            team_bars_assoc.visited = True
-                            team_bars_assoc.points += bar_data["points"]
-                            team_bars_assoc.drinks += bar_data["drinks"]
-                            team_bars_assoc.has_egg = bar_data["has_egg"]
-                            team_bars_assoc.puked = bar_data["puked"]
-                            team_bars_assoc.won_game = bar_data["won_game"]
-                            team_bars_assoc.save()
-                        except Bars.DoesNotExist as e:
-                            response = {
-                                "status": status.HTTP_400_BAD_REQUEST,
-                                "message": f"There is no bar with the id {data['bar']}"
-                            }
-                            logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
-                            return Response(response, status=response["status"])
-
-                    team.save()
+                    patch_team(data, id) 
                     response = {
                         "status": status.HTTP_200_OK,
                         "message": f"Updated team {team.name} successfully"
@@ -279,6 +238,28 @@ def _get_team(team_object):
 
     return team
 
+def patch_team(data, id):
+    team = Teams.objects.get(id=id)
+    modifiable_fields = ["name", "phone", "points", "drinks", "has_egg", "puked", "best_name", "best_team_costume", "won_special_game"]
+    for field in modifiable_fields:
+        if field in data:
+            setattr(team, field, data[field])
+
+    # update team bar association if given
+    if "bar" in data:
+        bar_data = data["bar"]
+        bar = Bars.objects.get(id=bar_data["id"])
+
+        team_bars_assoc = TeamsBars.objects.get(teamId=team.id, barId=bar_data["id"])
+        team_bars_assoc.visited = True
+        team_bars_assoc.points += bar_data["points"]
+        team_bars_assoc.drinks += bar_data["drinks"]
+        team_bars_assoc.has_egg = bar_data["has_egg"]
+        team_bars_assoc.puked = bar_data["puked"]
+        team_bars_assoc.won_game = bar_data["won_game"]
+        team_bars_assoc.save()
+
+    team.save()
 
 @api_view(["POST", "GET", "DELETE", "PATCH"])
 @permission_classes((IsAuthenticatedOrReadOnly,))
@@ -416,45 +397,7 @@ def members(request, id=None):
             data = json.loads(request.body)
             if id is not None:
                 try:
-                    member = Members.objects.get(id=id)
-                    modifiable_fields = ["name", "nmec", "course", "team", "points", "drinks"]
-                    for field in modifiable_fields:
-                        if field in data:
-                            # if field is nmec, check if it already exists
-                            if field == "nmec":
-                                try:
-                                    Members.objects.get(nmec=data[field])
-                                    response = {
-                                        "status": status.HTTP_400_BAD_REQUEST,
-                                        "message": f"Member with nmec {data[field]} already exists"
-                                    }
-                                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
-                                    return Response(response, status=response["status"])
-                                except Members.DoesNotExist:
-                                    pass
-                                
-                            setattr(member, field, data[field])
-
-                    # update members bar association if given
-                    if "bar" in data:
-                        try:
-                            bar_data = data["bar"]
-                            bar = Bars.objects.get(id=bar_data["id"])
-
-                            member_bars_assoc = MembersBars.objects.get(memberId=member.id, barId=bar_data["id"])
-                            member_bars_assoc.points += bar_data["points"]
-                            member_bars_assoc.drinks += bar_data["drinks"]
-                            member_bars_assoc.save()
-                        except Bars.DoesNotExist as e:
-                            response = {
-                                "status": status.HTTP_400_BAD_REQUEST,
-                                "message": f"There is no bar with the id {data['bar']}"
-                            }
-                            logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
-                            return Response(response, status=response["status"])
-
-                    member.save()
-
+                    patch_member(data, id)
                     response = {
                         "status": status.HTTP_200_OK,
                         "message": f"Updated member {member.name} successfully with nmec {member.nmec}"
@@ -501,6 +444,26 @@ def _get_member(member_object):
         for bar in member_bars]
 
     return member
+
+def patch_member(data, id):
+    member = Members.objects.get(id=id)
+    modifiable_fields = ["name", "nmec", "course", "team", "points", "drinks"]
+    for field in modifiable_fields:
+        if field in data:
+          setattr(member, field, data[field])
+
+    # update members bar association if given
+    if "bar" in data:
+        bar_data = data["bar"]
+        bar = Bars.objects.get(id=bar_data["id"])
+
+        member_bars_assoc = MembersBars.objects.get(memberId=member.id, barId=bar_data["id"])
+        member_bars_assoc.points += bar_data["points"]
+        member_bars_assoc.drinks += bar_data["drinks"]
+        member_bars_assoc.save()
+
+
+    member.save()
 
 
 @api_view(["POST", "GET", "DELETE", "PATCH"])
@@ -665,42 +628,7 @@ def bars(request, id=None):
             data = json.loads(request.body)
             if id is not None:
                 try:
-                    bar = Bars.objects.get(id=id)
-                    modifiable_fields = ["name", "address", "latitude", "longitude", "picture", "points", "drinks", "puked", "game"]
-                    for field in modifiable_fields:
-                        if field in data:
-                            # if field is name, check if it already exists
-                            if field == "name":
-                                try:
-                                    Bars.objects.get(name=data[field])
-
-                                    response = {
-                                        "status": status.HTTP_400_BAD_REQUEST,
-                                        "message": f"There is already a bar with the name {data[field]}"
-                                    }
-                                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
-                                    return Response(response, status=response["status"])
-                                except Members.DoesNotExist:
-                                    pass
-
-                            # if field is game, check if it exists
-                            if field == "game":
-                                try:
-                                    game = Games.objects.get(id=data[field])
-                                    setattr(bar, field, game)
-                                    continue
-                                except Games.DoesNotExist as e:
-                                    response = {
-                                        "status": status.HTTP_400_BAD_REQUEST,
-                                        "message": f"There is no game with the id {data[field]}"
-                                    }
-                                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
-                                    return Response(response, status=response["status"])
-                                
-                            setattr(bar, field, data[field])
-
-                    bar.save()
-
+                    patch_bar(data, id)
                     response = {
                         "status": status.HTTP_200_OK,
                         "message": f"Updated bar {bar.name} successfully"
@@ -728,6 +656,23 @@ def bars(request, id=None):
             }
             logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
             return Response(response, status=response["status"])
+
+
+def patch_bar(data, id):
+    bar = Bars.objects.get(id=id)
+    modifiable_fields = ["name", "address", "latitude", "longitude", "picture", "points", "drinks", "puked", "game"]
+    for field in modifiable_fields:
+        if field in data:
+            # if field is game, check if it exists
+            if field == "game":
+                game = Games.objects.get(id=data[field])
+                setattr(bar, field, game)
+            
+            else:
+                setattr(bar, field, data[field])
+
+    bar.save()
+
 
 @api_view(["POST", "GET"])
 @csrf_exempt
@@ -1021,27 +966,7 @@ def games(request, id=None):
             data = json.loads(request.body)
             if id is not None:
                 try:
-                    game = Games.objects.get(id=id)
-                    modifiable_fields = ["name", "location", "points", "completed"]
-                    for field in modifiable_fields:
-                        if field in data:
-                            # if field is name, check if it already exists
-                            if field == "name":
-                                try:
-                                    Games.objects.get(name=data[field])
-                                    response = {
-                                        "status": status.HTTP_400_BAD_REQUEST,
-                                        "message": f"Game with name {data[field]} already exists"
-                                    }
-                                    logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]}')
-                                    return Response(response, status=response["status"])
-                                except Games.DoesNotExist:
-                                    pass
-                                
-                            setattr(game, field, data[field])
-
-                    game.save()
-
+                    patch_game(data, id)
                     response = {
                         "status": status.HTTP_200_OK,
                         "message": f"Updated game {game.name} successfully"
@@ -1070,6 +995,16 @@ def games(request, id=None):
             logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
             return Response(response, status=response["status"])
 
+
+def patch_game(data, id):
+    game = Games.objects.get(id=id)
+    modifiable_fields = ["name", "location", "points", "completed"]
+    for field in modifiable_fields:
+        if field in data:
+            setattr(game, field, data[field])
+
+    game.save()
+   
 
 @api_view(["POST", "GET", "DELETE", "PATCH"])
 @permission_classes((IsAuthenticatedOrReadOnly,))

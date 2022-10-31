@@ -48,10 +48,7 @@ def teamplay(request):
                         "Authorization": f"Token {request.auth.key}"
                     }
 
-                    put_data.delay({
-                        'token': request.auth.key,
-                        'data': data
-                    })
+                    put_data.delay(data)
 
                     response = {
                         "status": status.HTTP_200_OK,
@@ -102,7 +99,7 @@ def teamplay(request):
             logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
             return Response(response, status=response["status"])
 
-        
+
 @api_view(['GET'])
 @permission_classes((AllowAny,))
 @csrf_exempt

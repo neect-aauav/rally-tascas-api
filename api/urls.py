@@ -61,6 +61,7 @@ urlpatterns = [
     
     # /teamplay
     path('teamplay', rallytascas_views.teamplay),
+
     # /scoreboard/teams
     path('scoreboard/teams', rallytascas_views.scoreboard_teams),
     # /scoreboard/members
