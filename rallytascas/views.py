@@ -46,21 +46,21 @@ def teamplay(request):
                         "Authorization": f"Token {request.auth.key}"
                     }
 
-                    # # update team
-                    # requests.patch(f"{BASE_IRI}/api/teams/{data['team_id']}", json={
-                    #     "points": team.points + data["points"],
-                    #     "drinks": team.drinks + data["drinks"],
-                    #     "has_egg": data["has_egg"],
-                    #     "puked": team.puked + data["puked"],
-                    #     "bar": {
-                    #         "id": bar.id,
-                    #         "points": data["points"],
-                    #         "drinks": data["drinks"],
-                    #         "has_egg": data["has_egg"],
-                    #         "puked": data["puked"],
-                    #         "won_game": data["game_completed"]
-                    #     }
-                    # }, headers=headers)
+                    # update team
+                    requests.patch(f"{BASE_IRI}/api/teams/{data['team_id']}", json={
+                        "points": team.points + data["points"],
+                        "drinks": team.drinks + data["drinks"],
+                        "has_egg": data["has_egg"],
+                        "puked": team.puked + data["puked"],
+                        "bar": {
+                            "id": bar.id,
+                            "points": data["points"],
+                            "drinks": data["drinks"],
+                            "has_egg": data["has_egg"],
+                            "puked": data["puked"],
+                            "won_game": data["game_completed"]
+                        }
+                    }, headers=headers)
 
                     # try:
                     #     for member in data["members"]:
