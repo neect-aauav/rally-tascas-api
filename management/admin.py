@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from api.models import Members, Teams
+from api.models import Members, Teams, Bars, Games, Prizes
 
 from .models import Account, DBLogger
 
@@ -39,8 +39,37 @@ class MembersAdmin(admin.ModelAdmin):
     list_filter = ()
     fieldsets = ()
 
+class BarsAdmin(admin.ModelAdmin):
+    list_display = ('name', 'address', 'puked', 'game')
+    search_fields = ['name']
+    readonly_fields = ()
+
+    filter_horizontal = ()
+    list_filter = ()
+    fieldsets = ()
+
+class GamesAdmin(admin.ModelAdmin):
+    list_display = ('name', 'description')
+    search_fields = ['name']
+    readonly_fields = ()
+
+    filter_horizontal = ()
+    list_filter = ()
+    fieldsets = ()
+
+class PrizesAdmin(admin.ModelAdmin):
+    list_display = ('place', 'name', 'ammount')
+    search_fields = ['name']
+    readonly_fields = ()
+
+    filter_horizontal = ()
+    list_filter = ()
+    fieldsets = ()
 
 admin.site.register(Account, AccountAdmin)
 admin.site.register(DBLogger, DBLoggerAdmin)
 admin.site.register(Teams, TeamsAdmin)
 admin.site.register(Members, MembersAdmin)
+admin.site.register(Bars, BarsAdmin)
+admin.site.register(Games, GamesAdmin)
+admin.site.register(Prizes, PrizesAdmin)

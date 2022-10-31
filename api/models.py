@@ -27,11 +27,17 @@ class Members(models.Model):
 	drinks = models.IntegerField(default=0)
 	team = models.ForeignKey(Teams, on_delete=models.CASCADE)
 
+	def __str__(self):
+		return str(self.name)
+
 class Games(models.Model):
 	name = models.CharField(max_length=255)
 	description = models.TextField(default="")
 	points = models.IntegerField(default=0)
 	completed = models.IntegerField(default=0)
+
+	def __str__(self):
+		return str(self.name)
 
 class Bars(models.Model):
 	name = models.CharField(max_length=255)
@@ -68,3 +74,6 @@ class Prizes(models.Model):
 	name = models.CharField(max_length=255)
 	ammount = models.IntegerField()
 	winner = models.ForeignKey(Teams, on_delete=models.CASCADE, default=None, blank=True, null=True)
+
+	def __str__(self):
+		return str(self.name)
