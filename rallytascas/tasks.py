@@ -12,7 +12,7 @@ logger.propagate = True
 
 from neectrally.settings import BASE_IRI
 
-@shared_task
+@app.task
 def put_data(msg):
     AUTH_KEY = msg['token']
     data = msg['data']
