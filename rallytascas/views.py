@@ -14,7 +14,7 @@ from neectrally.settings import BASE_IRI
 from api.models import MembersBars, Teams, Members, Bars, Games
 from management import logger
 
-from . import db_queue
+from .tasks import put_data
 
 @api_view(["POST"])
 @permission_classes((IsAuthenticatedOrReadOnly,))
@@ -48,54 +48,10 @@ def teamplay(request):
                         "Authorization": f"Token {request.auth.key}"
                     }
 
-                    # update team
-                    requests.patch(f"{BASE_IRI}/api/teams/{data['team_id']}", json={
-                        "points": team.points + data["points"],
-                        "drinks": team.drinks + data["drinks"],
-                        "has_egg": data["has_egg"],
-                        "puked": team.puked + data["puked"],
-                        "bar": {
-                            "id": bar.id,
-                            "points": data["points"],
-                            "drinks": data["drinks"],
-                            "has_egg": data["has_egg"],
-                            "puked": data["puked"],
-                            "won_game": data["game_completed"]
-                        }
-                    }, headers=headers)
-
-                    # try:
-                    #     for member in data["members"]:
-                    #         member_object = Members.objects.get(id=member["id"])
-                    #         # update members
-                    #         requests.patch(f"{BASE_IRI}/api/members/{member['id']}", json={
-                    #             "points": member_object.points + member["points"],
-                    #             "drinks": member_object.drinks + member["drinks"],
-                    #             "bar": {
-                    #                 "id": bar.id,
-                    #                 "points": member["points"],
-                    #                 "drinks": member["drinks"]
-                    #             }
-                    #         }, headers=headers)
-                    # except Members.DoesNotExist as e:
-                    #     response = {
-                    #         "status": status.HTTP_400_BAD_REQUEST,
-                    #         "message": f"There is no member with the given id"
-                    #     }
-                    #     logger.error(request.auth.key, f'[{response["status"]}]@"{request.method} {request.path}": {response["message"]} ({e})')
-                    #     return Response(response, status=response["status"])
-
-                    # # update bars
-                    # requests.patch(f"{BASE_IRI}/api/bars/{data['bar_id']}", json={
-                    #     "points": bar.points + data["points"],
-                    #     "drinks": bar.drinks + data["drinks"],
-                    #     "puked": bar.puked + data["puked"],
-                    # }, headers=headers)
-
-                    # # update games
-                    # requests.patch(f"{BASE_IRI}/api/games/{game.id}", json={
-                    #     "completed": game.completed + 1 if data["game_completed"] else 0
-                    # }, headers=headers)
+                    put_data.delay({
+                        'token': request.auth.key,
+                        'data': data
+                    })
 
                     response = {
                         "status": status.HTTP_200_OK,

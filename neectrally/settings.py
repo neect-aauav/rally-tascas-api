@@ -174,9 +174,9 @@ DATABASES['default'].update(db_from_env)
 CELERY_BROKER_URL="redis://"
 CELERY_ENABLE_UTC = False
 CELERY_TIMEZONE = 'Europe/Lisbon'
-CELERY_BEAT_SCHEDULE = {
-    'put_data': {
-        'task':'rallytascas.tasks.put_data',
-        'schedule':timedelta(milliseconds=5000)
-    }
-}
+# CELERY_BEAT_SCHEDULE = {
+#     'put_data': {
+#         'task':'rallytascas.tasks.put_data',
+#         'schedule':timedelta(milliseconds=5000)
+#     }
+# }
