@@ -5,11 +5,13 @@ This application was created using **Python** and **Django**.
 
 ## Table of Contents
 
-1. [Setup](#setup)
-1. [API Docs](#api-docs)
-1. [Generate Data](#generate-data)
-1. [Issues](#issues)
-    1. [MySQL Root Password](#mysql-root-password)
+- [rally-tascas-api](#rally-tascas-api)
+  - [Table of Contents](#table-of-contents)
+  - [Setup](#setup)
+  - [API Docs](#api-docs)
+  - [Generate Data](#generate-data)
+  - [Issues](#issues)
+    - [MySQL Root Password](#mysql-root-password)
 
 ## Setup
 1. Setup MySQL database
@@ -68,7 +70,7 @@ You can generate bulks of data, dummy or not, to the database with the following
 
 ```bash
 cd data
-$ python3 generator.py
+$ python3 generate.py
 ```
 
 ## Issues
