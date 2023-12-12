@@ -1,47 +1,37 @@
 [
     {
-        "name": "Mimisutra",
-        "description": "",
-        "points": 50
+        "name": "Match Words",
+        "description": "O jogo consiste em encontrar a semelhança nas palavras, isto é, cada elemento do grupo diz uma palavra ao mesmo tempo e vão vendo as semelhanças com o que disseram e vão fazendo várias vezes até todos dizerem a mesma palavra ao mesmo tempo, se chegarem à mesma palavra em menos de 7 rondas ganham pontos e bebem.",
+        "points": 20
     },
     {
-        "name": "Penalti mais rápido",
-        "description": "",
-        "points": 50
+        "name": "Descobre a música",
+        "description": "O jogo consiste em encher a boca com água e cantar uma música escolhida pelos trabalhadores do ponto, a equipa tem de adivinhar que música para ganhar pontos e beber.",
+        "points": 20
     },
     {
-        "name": "Cantar acapella",
-        "description": "",
-        "points": 50
+        "name": "Beer Pong Flash",
+        "description": "6 copos com água, a equipa tem 3 minutos para mandar as bolas, tem que haver rotatividade nos jogadores da equipa, a partir de 5 copos, ganham um shot e pontos.",
+        "points": 20
     },
     {
-        "name": "Ligar para alguém",
-        "description": "Ligar para alguém aleatório e dizer na chamada as palavras que vão sendo dadas",
-        "points": 50
+        "name": "Troca de copo",
+        "description": "Cada jogador necessita de 2 copos, 1 com bebida e outro vazio e uma colher, os jogadores têm 30 segundos para passarem a bebida de um copo para o outro utilizando a colher, quando o tempo acabar a equipa com os copos (originais) mais vazios ganha pontos e cada jogador bebe o restante do copo original.",
+        "points": 20
     },
     {
-        "name": "Pack 5 Shots",
-        "description": "Alguém beber 5 shots seguidos",
-        "points": 50
+        "name": "Flash Flip The Cup",
+        "description": "A equipa tem que virar 5 copos em 30 segundos. A equipa que conseguir virar todos os copos tem direito a uma rodada de shots e pontos.",
+        "points": 20
     },
     {
-        "name": "Caixa fechada",
-        "description": "Tentar adivihar o que está dentro da caixa",
-        "points": 50
+        "name": "Pirâmide Humana",
+        "description": "Terão de fazer uma pirâmide utilizando todos os membros do grupo.",
+        "points": 20
     },
     {
-        "name": "Atirar bola",
-        "description": "Atirar uma bola contra uma torre de latas",
-        "points": 50
-    },
-    {
-        "name": "Banco/roda humana",
-        "description": "",
-        "points": 50
-    },
-    {
-        "name": "Colheres em Estafeta",
-        "description": "",
-        "points": 50
+        "name": "Servir Shots",
+        "description": "Um dos membros do grupo terá de servir um shot sem utilizar as mãos ou qualquer tipo de utensílios.",
+        "points": 20
     }
 ]

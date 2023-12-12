@@ -1,58 +1,59 @@
 [
     {
-        "name": "Casa Pina",
+        "name": "Estacionamento do Hospital",
         "address": "R. Antónia Rodrigues 36, 3800-102 Aveiro",
         "latitude": 40.64382661695054,
         "longitude": -8.655127674722474,
         "game": 1
     },
     {
-        "name": "Posto 7",
+        "name": "Estacionamento do Autocarro Bar",
         "address": "Largo da Praça do Peixe 30, 3800-209 Aveiro",
         "latitude": 40.64291964216214,
         "longitude": -8.654945888213359,
         "game": 2
     },
     {
-        "name": "Dokk Club",
+        "name": "Parte de trás do IEETA",
         "address": "Largo da Praça do Peixe 42, 3800-209 Aveiro",
         "latitude": 40.64236057534645,
         "longitude": -8.655132403558937,
         "game": 3
     },
     {
-        "name": "Drinks",
+        "name": "Fotossintese",
         "address": "R. Homem Cristo Filho 4, 3810-100 Aveiro",
         "latitude": 40.63895655972107,
         "longitude": -8.656326457457263,
         "game": 6
     },
     {
-        "name": "Parque da Macaca / McDonald's",
+        "name": "Lago da UA",
         "address": "R. das Pombas, 3810-150 Aveiro",
         "latitude": 40.63259224969681,
         "longitude": -8.651403558885985,
         "game": 5
     },
     {
-        "name": "ISCA-UA",
+        "name": "Entrada do Estacionamento da Biblioteca",
         "address": "Rua Associação Humanitária dos Bombeiros Voluntários de Aveiro, 3810-902 Aveiro",
         "latitude": 40.6305634,
         "longitude": -8.6557738,
         "game": 7
     },
     {
-        "name": "Meia Lua",
+        "name": "Ponte do crasto",
         "address": "Campus Universitário de Santiago, Universidade de Aveiro, 3810-193 Aveiro",
         "latitude": 40.6295750080371,
         "longitude": -8.656427584219601,
         "game": 8
     },
     {
-        "name": "ESSUA",
+        "name": "Bar do Estudante",
         "address": "Campus Universitário de Santiago, Agra do Crasto, Edifício 30, 3810-193 Aveiro",
         "latitude": 40.62365311138041,
         "longitude": -8.657516997204388,
         "game": 9
     }
+    
 ]
