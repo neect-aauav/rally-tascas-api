@@ -25,7 +25,7 @@
         "address": "R. Homem Cristo Filho 4, 3810-100 Aveiro",
         "latitude": 40.63895655972107,
         "longitude": -8.656326457457263,
-        "game": 6
+        "game": 4
     },
     {
         "name": "Lago da UA",
@@ -39,21 +39,21 @@
         "address": "Rua Associação Humanitária dos Bombeiros Voluntários de Aveiro, 3810-902 Aveiro",
         "latitude": 40.6305634,
         "longitude": -8.6557738,
-        "game": 7
+        "game": 6
     },
     {
         "name": "Ponte do crasto",
         "address": "Campus Universitário de Santiago, Universidade de Aveiro, 3810-193 Aveiro",
         "latitude": 40.6295750080371,
         "longitude": -8.656427584219601,
-        "game": 8
+        "game": 7
     },
     {
         "name": "Bar do Estudante",
         "address": "Campus Universitário de Santiago, Agra do Crasto, Edifício 30, 3810-193 Aveiro",
         "latitude": 40.62365311138041,
         "longitude": -8.657516997204388,
-        "game": 9
+        "game": 7
     }
     
 ]
