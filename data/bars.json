@@ -1,59 +1,58 @@
 [
     {
-        "name": "Estacionamento do Hospital",
-        "address": "R. Antónia Rodrigues 36, 3800-102 Aveiro",
-        "latitude": 40.64382661695054,
-        "longitude": -8.655127674722474,
+        "name": "Departamento de Biologia",
+        "address": "Campus de Santiago, 3810-193 Aveiro",
+        "latitude": 40.633114,
+        "longitude": -8.655342,
         "game": 1
     },
     {
-        "name": "Estacionamento do Autocarro Bar",
-        "address": "Largo da Praça do Peixe 30, 3800-209 Aveiro",
-        "latitude": 40.64291964216214,
-        "longitude": -8.654945888213359,
+        "name": "Antiga Reitoria",
+        "address": "Estacionamento, 3810-193 Aveiro",
+        "latitude": 40.633743, 
+        "longitude": -8.659274,
         "game": 2
     },
     {
-        "name": "Parte de trás do IEETA",
-        "address": "Largo da Praça do Peixe 42, 3800-209 Aveiro",
-        "latitude": 40.64236057534645,
-        "longitude": -8.655132403558937,
+        "name": "IEETA",
+        "address": "IEETA - Instituto de Engenharia Electrónica e Telemática de Aveiro, 3810-193 Aveiro",
+        "latitude": 40.633139,
+        "longitude": -8.660472,
         "game": 3
     },
     {
-        "name": "Fotossintese",
-        "address": "R. Homem Cristo Filho 4, 3810-100 Aveiro",
-        "latitude": 40.63895655972107,
-        "longitude": -8.656326457457263,
+        "name": "Parque Frente à Prisão de Aveiro",
+        "address": "Universidade de Aveiro, 3810-096 Aveiro",
+        "latitude": 40.636453, 
+        "longitude": -8.657182,
         "game": 4
     },
     {
-        "name": "Lago da UA",
-        "address": "R. das Pombas, 3810-150 Aveiro",
-        "latitude": 40.63259224969681,
-        "longitude": -8.651403558885985,
+        "name": "Fábrica da Ciência Viva",
+        "address": "R. dos Santos Mártires 1A, 3810-164 Aveiro",
+        "latitude": 40.638531,
+        "longitude": -8.657507,
         "game": 5
     },
     {
-        "name": "Entrada do Estacionamento da Biblioteca",
-        "address": "Rua Associação Humanitária dos Bombeiros Voluntários de Aveiro, 3810-902 Aveiro",
-        "latitude": 40.6305634,
-        "longitude": -8.6557738,
+        "name": "Clube de Ténis de Aveiro",
+        "address": "R. Manuel Mendes 2, 3810-164 Aveiro",
+        "latitude": 40.638707,
+        "longitude": -8.656417,
         "game": 6
     },
     {
-        "name": "Ponte do crasto",
-        "address": "Campus Universitário de Santiago, Universidade de Aveiro, 3810-193 Aveiro",
-        "latitude": 40.6295750080371,
-        "longitude": -8.656427584219601,
+        "name": "Bairro do Alboi",
+        "address": "Largo do Conselheiro Queiroz 28, 3810-126 Aveiro",
+        "latitude": 40.639753,
+        "longitude": -8.657079,
         "game": 7
     },
     {
-        "name": "Bar do Estudante",
-        "address": "Campus Universitário de Santiago, Agra do Crasto, Edifício 30, 3810-193 Aveiro",
-        "latitude": 40.62365311138041,
-        "longitude": -8.657516997204388,
+        "name": "Parte de cima Ria Café",
+        "address": "R. do Clube dos Galitos 9, 3810-164 Aveiro",
+        "latitude": 40.641115,
+        "longitude": -8.654737,
         "game": 7
     }
-    
 ]
